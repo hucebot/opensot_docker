@@ -30,6 +30,8 @@ Examples:
 [talos_cartesio_config](https://github.com/hucebot/talos_cartesio_config)
 - terminal 1 ```roscore```
 - terminal 2 ```reset && mon launch talos_cartesio_config cartesio.launch```
+  
+or
 
 - terminal 1 ```roscore```
 - terminal 2 ```reset && mon launch talos_cartesio_config cartesio.launch stack:=simple_id```
