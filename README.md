@@ -1,6 +1,6 @@
 opensot_docker
 ==============
-A ```DockerFile``` containing  to run the OpenSoT and CartesI/O frameworks.
+A ```DockerFile``` to run the [OpenSoT](https://github.com/ADVRHumanoids/OpenSoT) and [CartesI/O](https://github.com/ADVRHumanoids/CartesianInterface) frameworks.
 
 Build the DockerFile:
 --------------------- 
@@ -12,7 +12,7 @@ Run the docker image:
 ----------------------
 Run the script ```./run_docker.sh``` in the ```opensot_docker``` folder.
 
-Inside the image terminal run ```terminator``` to open a new terminal. You can plit this terminal horizontally using the shortcut ```Ctrl + Shift + o``` or in vertical using ```Ctrl + Shift + e```.
+Inside the image terminal run ```terminator``` to open a new terminal. You can split this terminal horizontally using the shortcut ```Ctrl + Shift + o``` or in vertical using ```Ctrl + Shift + e```.
 
 Examples:
 ---------
