@@ -38,3 +38,15 @@ or
 
 
 IMPORTANT: right-click on the interactive marker and click on ```Continuous Ctrl``` thick to move the marker and send commands to the controlled end-effector.
+
+Run Python Examples:
+--------------------
+The Python examples can be found in ```/home/forest_ws/src/OpenSoT/bindings/python/examples```.
+
+For the IK example using the Panda robot runs:
+
+```python panda_ik.py```
+
+while for the ID example using the Little Dog robot runs:
+
+```python LittleDog_id.py```
