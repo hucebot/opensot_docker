@@ -14,6 +14,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get clean  && apt-get install -y
     git \
     ninja-build \
     cmake \
+    gedit \
     build-essential \
     libopenblas-dev \
     clang unzip \
@@ -123,7 +124,7 @@ RUN git clone https://github.com/ADVRHumanoids/OpenSoT.git
 WORKDIR /home/forest_ws/src/OpenSoT
 RUN git checkout 4.0-devel
 WORKDIR /home/forest_ws/build/OpenSoT
-RUN source /opt/ros/noetic/setup.bash && source /home/forest_ws/setup.bash && cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/OpenSoT && make -j8 && make install
+RUN source /opt/ros/noetic/setup.bash && source /home/forest_ws/setup.bash && cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release -DOPENSOT_SOTH_FRONT_END=ON ../../src/OpenSoT && make -j8 && make install
 
 # reflexxes
 WORKDIR /home/forest_ws/src
@@ -210,6 +211,9 @@ WORKDIR /home/forest_ws/src/pal_gripper
 RUN git checkout humble-devel
 
 WORKDIR /home/forest_ws/src
+RUN git clone https://github.com/EnricoMingo/LittleDog.git
 
-RUN echo 'export ROS_PACKAGE_PATH="${ROS_PACKAGE_PATH}:/home/forest_ws/src/tiago_dual_cartesio_config:/home/forest_ws/src/tiago_dual_robot:/home/forest_ws/src/tiago_dual_description_calibration:/home/forest_ws/src/pal_urdf_utils:/home/forest_ws/src/omni_base_robot:/home/forest_ws/src/tiago_robot:/home/forest_ws/src/hey5_description:/home/forest_ws/src/pmb2_robot:/home/forest_ws/src/pal_gripper"' >> ~/.bashrc
+WORKDIR /home/forest_ws/src
+
+RUN echo 'export ROS_PACKAGE_PATH="${ROS_PACKAGE_PATH}:/home/forest_ws/src/tiago_dual_cartesio_config:/home/forest_ws/src/tiago_dual_robot:/home/forest_ws/src/tiago_dual_description_calibration:/home/forest_ws/src/pal_urdf_utils:/home/forest_ws/src/omni_base_robot:/home/forest_ws/src/tiago_robot:/home/forest_ws/src/hey5_description:/home/forest_ws/src/pmb2_robot:/home/forest_ws/src/pal_gripper:/home/forest_ws/src/LittleDog"' >> ~/.bashrc
 
