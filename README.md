@@ -37,7 +37,7 @@ or
 - terminal 2 ```reset && mon launch talos_cartesio_config cartesio.launch stack:=simple_id```
 
 
-IMPORTANT: right-click on the interactive marker and click on ```Continuous Ctrl``` thick to move the marker and send commands to the controlled end-effector.
+**IMPORTANT:** right-click on the interactive marker and click on ```Continuous Ctrl``` thick to move the marker and send commands to the controlled end-effector.
 
 Run Python Examples:
 --------------------
