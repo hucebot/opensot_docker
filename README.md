@@ -16,6 +16,9 @@ Inside the image terminal run ```terminator``` to open a new terminal. You can s
 
 Examples:
 ---------
+**IMPORTANT:** right-click on the interactive marker and left-click on ```Continuous Ctrl``` thick to enable sending commands to the controlled end-effector while moving the marker.
+
+[CartesI/O](https://github.com/ADVRHumanoids/CartesianInterface)
 - Terminal 1 ```roscore```
 - Terminal 2 ```reset && mon launch cartesian_interface coman.launch```
 
@@ -35,9 +38,6 @@ or
 
 - terminal 1 ```roscore```
 - terminal 2 ```reset && mon launch talos_cartesio_config cartesio.launch stack:=simple_id```
-
-
-**IMPORTANT:** right-click on the interactive marker and click on ```Continuous Ctrl``` thick to move the marker and send commands to the controlled end-effector.
 
 Run Python Examples:
 --------------------
