@@ -51,9 +51,9 @@ RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main"
 
 RUN curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add -
 
-RUN apt-get update && apt-get install -y ros-noetic-desktop-full 
-RUN apt-get update && apt-get install -y ros-noetic-srdfdom \
-	  ros-noetic-urdf ros-noetic-geometric-shapes ros-noetic-moveit-core
+RUN apt-get update && apt-get install -y ros-noetic-desktop-full ros-noetic-srdfdom \
+	  ros-noetic-urdf ros-noetic-geometric-shapes ros-noetic-moveit-core ros-noetic-franka-ros ros-noetic-rosmon terminator \
+	  ros-noetic-moveit-ros-planning ros-noetic-moveit-ros-planning-interface
 
 RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
  
@@ -62,7 +62,7 @@ WORKDIR /home/forest_ws
 ENV HHCM_FOREST_CLONE_DEFAULT_PROTO=https
 ENV PYTHONUNBUFFERED=1
 
-RUN pip install --upgrade hhcm-forest && forest init
+RUN pip install --upgrade ttictoc hhcm-forest && forest init
 RUN echo "source $PWD/setup.bash" >> ~/.bashrc
 
 RUN forest add-recipes git@github.com:advrhumanoids/multidof_recipes.git 
@@ -139,7 +139,6 @@ WORKDIR /home/forest_ws/src/CartesianInterface
 RUN git checkout 3.0-devel
 WORKDIR /home/forest_ws/build/CartesianInterface
 RUN source /opt/ros/noetic/setup.bash && source /home/forest_ws/setup.bash && cmake -DCARTESIO_COMPILE_EXAMPLES=ON -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/CartesianInterface && make -j8 && make install
-RUN sudo apt-get install -y ros-noetic-rosmon terminator
 
 # cartesio_acceleration_support
 WORKDIR /home/forest_ws/src
@@ -150,7 +149,6 @@ WORKDIR /home/forest_ws/build/cartesio_acceleration_support
 RUN source /opt/ros/noetic/setup.bash && source /home/forest_ws/setup.bash && cmake -DCARTESIO_COMPILE_EXAMPLES=ON -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/cartesio_acceleration_support && make -j8 && make install
 
 # cartesio_collision_support
-RUN sudo apt-get install -y ros-noetic-moveit-ros-planning ros-noetic-moveit-ros-planning-interface
 WORKDIR /home/forest_ws/src
 RUN git clone https://github.com/ADVRHumanoids/cartesio_collision_support.git
 WORKDIR /home/forest_ws/src/cartesio_collision_support
@@ -158,8 +156,23 @@ RUN git checkout 2.0-devel
 WORKDIR /home/forest_ws/build/cartesio_collision_support
 RUN source /opt/ros/noetic/setup.bash && source /home/forest_ws/setup.bash && cmake -DCARTESIO_COMPILE_EXAMPLES=ON -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/cartesio_collision_support && make -j8 && make install
 
+# centauro_cartesio
+WORKDIR /home/forest_ws/src
+RUN git clone https://github.com/ADVRHumanoids/centauro_cartesio.git
+WORKDIR /home/forest_ws/src/centauro_cartesio
+RUN git checkout xbot2ifc
+WORKDIR /home/forest_ws/build/centauro_cartesio
+RUN source /opt/ros/noetic/setup.bash && source /home/forest_ws/setup.bash && cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/centauro_cartesio && make -j8 && make install
+
+# base_estimation
+WORKDIR /home/forest_ws/src
+RUN git clone https://github.com/ADVRHumanoids/base_estimation.git
+WORKDIR /home/forest_ws/src/base_estimation
+RUN git checkout xbot2ifc
+WORKDIR /home/forest_ws/build/base_estimation
+RUN source /opt/ros/noetic/setup.bash && source /home/forest_ws/setup.bash && cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/base_estimation && make -j8 && make install
+
 # franka_cartesio_config
-RUN sudo apt-get install -y ros-noetic-franka-ros
 WORKDIR /opt/ros/noetic/share/franka_description/robots/panda
 RUN cp panda.urdf.xacro ../ && cd .. && mv panda.urdf.xacro panda_arm.urdf.xacro
 WORKDIR /home/forest_ws/src
