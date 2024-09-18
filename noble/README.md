@@ -17,3 +17,7 @@ docker compose down
 ```bash
 docker compose exec dev terminator
 ```
+
+### Compilation out-of-docker
+The first time the docker is started, it is required to compile running the ```bootstrap.sh``` which is mounted inside the ```data``` folder, inside the running docker.
+
