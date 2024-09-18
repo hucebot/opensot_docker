@@ -1,3 +1,8 @@
+### Build the container
+```bash
+docker compose build
+```
+
 ### Start the container
 ```bash
 docker compose up -d
