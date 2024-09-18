@@ -1,0 +1,30 @@
+services:
+  dev:
+    build: 
+      context: .
+      args:
+        - USER_ID
+    stdin_open: true
+    tty: true 
+    privileged: true
+    entrypoint: /bin/bash
+    restart: always
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw  # x11
+      - ~/.ssh:/home/user/.ssh  # ssh
+      - ~/Qt:/home/user/Qt  # qt
+      - ./data:/home/user/data:rw  # persistent data folder
+    environment:
+      - TERM=xterm-256color
+      - DISPLAY
+      - NVIDIA_DRIVER_CAPABILITIES=all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+  
+
+
