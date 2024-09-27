@@ -122,7 +122,7 @@ RUN source /opt/ros/noetic/setup.bash && source /home/forest_ws/setup.bash && cm
 WORKDIR /home/forest_ws/src
 RUN git clone https://github.com/ADVRHumanoids/OpenSoT.git
 WORKDIR /home/forest_ws/src/OpenSoT
-RUN git checkout 4.0-devel
+RUN git checkout local_api_fix
 WORKDIR /home/forest_ws/build/OpenSoT
 RUN source /opt/ros/noetic/setup.bash && source /home/forest_ws/setup.bash && cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release -DOPENSOT_SOTH_FRONT_END=ON ../../src/OpenSoT && make -j8 && make install
 
@@ -136,7 +136,7 @@ RUN source /opt/ros/noetic/setup.bash && source /home/forest_ws/setup.bash && cm
 WORKDIR /home/forest_ws/src
 RUN git clone https://github.com/ADVRHumanoids/CartesianInterface.git
 WORKDIR /home/forest_ws/src/CartesianInterface
-RUN git checkout 3.0-devel
+RUN git checkout local_api_fix
 WORKDIR /home/forest_ws/build/CartesianInterface
 RUN source /opt/ros/noetic/setup.bash && source /home/forest_ws/setup.bash && cmake -DCARTESIO_COMPILE_EXAMPLES=ON -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/CartesianInterface && make -j8 && make install
 
