@@ -150,25 +150,19 @@ RUN source /opt/ros/noetic/setup.bash && source /home/forest_ws/setup.bash && cm
 
 # cartesio_collision_support
 WORKDIR /home/forest_ws/src
-RUN git clone https://github.com/ADVRHumanoids/cartesio_collision_support.git
-WORKDIR /home/forest_ws/src/cartesio_collision_support
-RUN git checkout 2.0-devel
+RUN git clone -b 2.0-devel https://github.com/ADVRHumanoids/cartesio_collision_support.git
 WORKDIR /home/forest_ws/build/cartesio_collision_support
 RUN source /opt/ros/noetic/setup.bash && source /home/forest_ws/setup.bash && cmake -DCARTESIO_COMPILE_EXAMPLES=ON -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/cartesio_collision_support && make -j8 && make install
 
 # centauro_cartesio
 WORKDIR /home/forest_ws/src
-RUN git clone https://github.com/ADVRHumanoids/centauro_cartesio.git
-WORKDIR /home/forest_ws/src/centauro_cartesio
-RUN git checkout xbot2ifc
+RUN git clone -b xbot2ifc https://github.com/ADVRHumanoids/centauro_cartesio.git
 WORKDIR /home/forest_ws/build/centauro_cartesio
 RUN source /opt/ros/noetic/setup.bash && source /home/forest_ws/setup.bash && cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/centauro_cartesio && make -j8 && make install
 
 # base_estimation
 WORKDIR /home/forest_ws/src
-RUN git clone https://github.com/ADVRHumanoids/base_estimation.git
-WORKDIR /home/forest_ws/src/base_estimation
-RUN git checkout xbot2ifc
+RUN git clone -b xbot2ifc https://github.com/ADVRHumanoids/base_estimation.git
 WORKDIR /home/forest_ws/build/base_estimation
 RUN source /opt/ros/noetic/setup.bash && source /home/forest_ws/setup.bash && cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/base_estimation && make -j8 && make install
 
@@ -176,57 +170,28 @@ RUN source /opt/ros/noetic/setup.bash && source /home/forest_ws/setup.bash && cm
 WORKDIR /opt/ros/noetic/share/franka_description/robots/panda
 RUN cp panda.urdf.xacro ../ && cd .. && mv panda.urdf.xacro panda_arm.urdf.xacro
 WORKDIR /home/forest_ws/src
-RUN git clone https://github.com/EnricoMingo/franka_cartesio_config.git
-WORKDIR /home/forest_ws/src/franka_cartesio_config
-RUN git checkout xbot2ifc
-RUN echo 'export ROS_PACKAGE_PATH="${ROS_PACKAGE_PATH}:/home/forest_ws/src/franka_cartesio_config"' >> ~/.bashrc
+RUN git clone -b xbot2ifc https://github.com/EnricoMingo/franka_cartesio_config.git
 
-# talos_cartesio_config
-WORKDIR /home/forest_ws/src
-RUN git clone https://github.com/hucebot/talos_cartesio_config.git
-RUN git clone https://github.com/pal-robotics/talos_robot.git
-RUN echo 'export ROS_PACKAGE_PATH="${ROS_PACKAGE_PATH}:/home/forest_ws/src/talos_cartesio_config:/home/forest_ws/src/talos_robot"' >> ~/.bashrc
+# Talos
+RUN git clone https://github.com/hucebot/talos_cartesio_config.git  \
+    &&  git clone https://github.com/pal-robotics/talos_robot.git
 
-# tiago_dual_cartesio_config
-WORKDIR /home/forest_ws/src
-RUN git clone https://github.com/hucebot/tiago_dual_cartesio_config.git
+## Tiago
+RUN git clone https://github.com/hucebot/tiago_dual_cartesio_config.git \
+    && git clone -b kinetic-devel https://github.com/EnricoMingo/tiago_dual_robot.git \
+    && git clone https://github.com/pal-robotics/tiago_dual_description_calibration.git \ 
+    && git clone https://github.com/pal-robotics/pal_urdf_utils.git \
+    && git clone -b melodic-devel https://github.com/pal-robotics/omni_base_robot.git \
+    && git clone -b foxy-devel https://github.com/pal-robotics/tiago_robot.git \
+    && git clone -b humble-devel https://github.com/pal-robotics/hey5_description.git \
+    && git clone -b humble-devel https://github.com/pal-robotics/pmb2_robot.git \
+    && git clone -b humble-devel https://github.com/EnricoMingo/pal_gripper.git
 
-RUN git clone https://github.com/EnricoMingo/tiago_dual_robot.git
-WORKDIR /home/forest_ws/src/tiago_dual_robot
-RUN git checkout kinetic-devel
-
-WORKDIR /home/forest_ws/src
-RUN git clone https://github.com/pal-robotics/tiago_dual_description_calibration.git
-RUN git clone https://github.com/pal-robotics/pal_urdf_utils.git
-
-RUN git clone https://github.com/pal-robotics/omni_base_robot.git
-WORKDIR /home/forest_ws/src/omni_base_robot
-RUN git checkout melodic-devel
-
-WORKDIR /home/forest_ws/src
-RUN git clone https://github.com/pal-robotics/tiago_robot.git
-WORKDIR /home/forest_ws/src/tiago_robot
-RUN git checkout foxy-devel
-
-WORKDIR /home/forest_ws/src
-RUN git clone https://github.com/pal-robotics/hey5_description.git
-WORKDIR /home/forest_ws/src/hey5_description
-RUN git checkout humble-devel
-
-WORKDIR /home/forest_ws/src
-RUN git clone https://github.com/pal-robotics/pmb2_robot.git
-WORKDIR /home/forest_ws/src/pmb2_robot
-RUN git checkout humble-devel
-
-WORKDIR /home/forest_ws/src
-RUN git clone https://github.com/EnricoMingo/pal_gripper.git
-WORKDIR /home/forest_ws/src/pal_gripper
-RUN git checkout humble-devel
-
-WORKDIR /home/forest_ws/src
+# Little Dog
 RUN git clone https://github.com/EnricoMingo/LittleDog.git
 
-WORKDIR /home/forest_ws/src
+RUN echo 'export ROS_PACKAGE_PATH="${ROS_PACKAGE_PATH}:/home/forest_ws/src/tiago_dual_cartesio_config:/home/forest_ws/src/tiago_dual_robot:/home/forest_ws/src/tiago_dual_description_calibration:/home/forest_ws/src/pal_urdf_utils:/home/forest_ws/src/omni_base_robot:/home/forest_ws/src/tiago_robot:/home/forest_ws/src/hey5_description:/home/forest_ws/src/pmb2_robot:/home/forest_ws/src/pal_gripper:/home/forest_ws/src/LittleDog:/home/forest_ws/src/franka_cartesio_config:/home/forest_ws/src/talos_cartesio_config:/home/forest_ws/src/talos_robot"' >> /home/forest_ws/setup.bash
 
-RUN echo 'export ROS_PACKAGE_PATH="${ROS_PACKAGE_PATH}:/home/forest_ws/src/tiago_dual_cartesio_config:/home/forest_ws/src/tiago_dual_robot:/home/forest_ws/src/tiago_dual_description_calibration:/home/forest_ws/src/pal_urdf_utils:/home/forest_ws/src/omni_base_robot:/home/forest_ws/src/tiago_robot:/home/forest_ws/src/hey5_description:/home/forest_ws/src/pmb2_robot:/home/forest_ws/src/pal_gripper:/home/forest_ws/src/LittleDog"' >> ~/.bashrc
-
+# Unitree G1, make sure to mount local repos
+# RUN git clone https://github.com/itsikelis/unitree_ros.git && git clone https://github.com/itsikelis/g1_opensot.git
+RUN echo 'export ROS_PACKAGE_PATH="${ROS_PACKAGE_PATH}:/home/forest_ws/src/unitree_ros/robots/g1_description:/home/forest_ws/src/g1_opensot"' >> /home/forest_ws/setup.bash
