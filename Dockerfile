@@ -107,7 +107,6 @@ RUN source /opt/ros/noetic/setup.bash && forest grow xbot_msgs --verbose --jobs 
 WORKDIR /home/forest_ws/src
 RUN git clone https://github.com/ADVRHumanoids/xbot2_interface.git && \
     cd /home/forest_ws/src/xbot2_interface && \
-    git checkout 80754b064869bf1fb6caecacf36d677f9c1145d9 && \
     mkdir -p /home/forest_ws/build/xbot2_interface && \
     cd /home/forest_ws/build/xbot2_interface && \
     source /opt/ros/noetic/setup.bash && \
@@ -147,7 +146,6 @@ RUN git clone https://github.com/Simple-Robotics/proxsuite.git && \
 # opensot
 RUN git clone -b 4.0-devel https://github.com/ADVRHumanoids/OpenSoT.git && \
     cd /home/forest_ws/src/OpenSoT && \
-    git checkout 3e114c49eb04f222c72b702efec3d7dbce11c2e1 && \
     mkdir -p /home/forest_ws/build/OpenSoT && \
     cd /home/forest_ws/build/OpenSoT && \
     source /opt/ros/noetic/setup.bash && \
@@ -167,9 +165,8 @@ RUN git clone https://github.com/ADVRHumanoids/RMLTypeII.git && \
     make install
 
 # CartesI/O
-RUN git clone -b 3.0-devel https://github.com/ADVRHumanoids/CartesianInterface.git && \
+RUN git clone -b local_api_fix https://github.com/ADVRHumanoids/CartesianInterface.git && \
     cd /home/forest_ws/src/CartesianInterface && \
-    git checkout dc234c8bffaa8bd40fe5532cd887c55108830358 && \
     mkdir -p /home/forest_ws/build/CartesianInterface && cd /home/forest_ws/build/CartesianInterface && \
     source /opt/ros/noetic/setup.bash && \
     source /home/forest_ws/setup.bash && \
@@ -180,7 +177,6 @@ RUN git clone -b 3.0-devel https://github.com/ADVRHumanoids/CartesianInterface.g
 # cartesio_acceleration_support
 RUN git clone -b 2.0-devel https://github.com/ADVRHumanoids/cartesio_acceleration_support.git && \
     cd /home/forest_ws/src/cartesio_acceleration_support && \
-    git checkout 4d304ee5120926ebf7ec912fb6befbe280655432 && \
     mkdir -p /home/forest_ws/build/cartesio_acceleration_support && \ 
     cd /home/forest_ws/build/cartesio_acceleration_support && \ 
     source /opt/ros/noetic/setup.bash && \
@@ -192,7 +188,6 @@ RUN git clone -b 2.0-devel https://github.com/ADVRHumanoids/cartesio_acceleratio
 # cartesio_collision_support
 RUN git clone -b 2.0-devel https://github.com/ADVRHumanoids/cartesio_collision_support.git && \
     cd /home/forest_ws/src/cartesio_collision_support && \
-    git checkout ab66869ef06a1eb0b05943baefa2707d49deb2cb && \
     mkdir -p /home/forest_ws/build/cartesio_collision_support && \
     cd /home/forest_ws/build/cartesio_collision_support && \
     source /opt/ros/noetic/setup.bash && \
