@@ -131,6 +131,7 @@ RUN git clone https://github.com/oxfordcontrol/osqp.git && \
 # proxQP
 RUN git clone https://github.com/Simple-Robotics/proxsuite.git && \
     cd /home/forest_ws/src/proxsuite && \
+    git checkout f19f07b51f66268db1f16cbeb538e891bb6d4e21 && \
     git submodule init && \
     git submodule update && \
     mkdir -p /home/forest_ws/build/proxsuite && \
@@ -162,7 +163,7 @@ RUN git clone https://github.com/ADVRHumanoids/RMLTypeII.git && \
     make install
 
 # CartesI/O
-RUN git clone -b 3.0-devel https://github.com/ADVRHumanoids/CartesianInterface.git && \
+RUN git clone -b local_api_fix https://github.com/ADVRHumanoids/CartesianInterface.git && \
     mkdir -p /home/forest_ws/build/CartesianInterface && cd /home/forest_ws/build/CartesianInterface && \
     source /opt/ros/noetic/setup.bash && \
     source /home/forest_ws/setup.bash && \
@@ -171,7 +172,7 @@ RUN git clone -b 3.0-devel https://github.com/ADVRHumanoids/CartesianInterface.g
     make install
 
 # cartesio_acceleration_support
-RUN git clone -b 2.0-devel https://github.com/ADVRHumanoids/cartesio_acceleration_support.git && \ 
+RUN git clone -b 2.0-devel https://github.com/ADVRHumanoids/cartesio_acceleration_support.git && \
     mkdir -p /home/forest_ws/build/cartesio_acceleration_support && \ 
     cd /home/forest_ws/build/cartesio_acceleration_support && \ 
     source /opt/ros/noetic/setup.bash && \
@@ -233,5 +234,7 @@ RUN git clone https://github.com/hucebot/tiago_dual_cartesio_config.git \
 
 # Little Dog
 RUN git clone https://github.com/EnricoMingo/LittleDog.git
+
+RUN pip install --upgrade scipy
 
 RUN echo 'export ROS_PACKAGE_PATH="${ROS_PACKAGE_PATH}:/home/forest_ws/src/tiago_dual_cartesio_config:/home/forest_ws/src/tiago_dual_robot:/home/forest_ws/src/tiago_dual_description_calibration:/home/forest_ws/src/pal_urdf_utils:/home/forest_ws/src/omni_base_robot:/home/forest_ws/src/tiago_robot:/home/forest_ws/src/hey5_description:/home/forest_ws/src/pmb2_robot:/home/forest_ws/src/pal_gripper:/home/forest_ws/src/LittleDog:/home/forest_ws/src/franka_cartesio_config:/home/forest_ws/src/talos_cartesio_config:/home/forest_ws/src/talos_robot"' >> /home/forest_ws/setup.bash
