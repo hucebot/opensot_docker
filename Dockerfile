@@ -106,7 +106,6 @@ RUN source /opt/ros/noetic/setup.bash && forest grow xbot_msgs --verbose --jobs 
 # xbot2_interface
 WORKDIR /home/forest_ws/src
 RUN git clone https://github.com/ADVRHumanoids/xbot2_interface.git && \
-    cd /home/forest_ws/src/xbot2_interface && \
     mkdir -p /home/forest_ws/build/xbot2_interface && \
     cd /home/forest_ws/build/xbot2_interface && \
     source /opt/ros/noetic/setup.bash && \
@@ -145,7 +144,6 @@ RUN git clone https://github.com/Simple-Robotics/proxsuite.git && \
 
 # opensot
 RUN git clone -b 4.0-devel https://github.com/ADVRHumanoids/OpenSoT.git && \
-    cd /home/forest_ws/src/OpenSoT && \
     mkdir -p /home/forest_ws/build/OpenSoT && \
     cd /home/forest_ws/build/OpenSoT && \
     source /opt/ros/noetic/setup.bash && \
@@ -166,7 +164,6 @@ RUN git clone https://github.com/ADVRHumanoids/RMLTypeII.git && \
 
 # CartesI/O
 RUN git clone -b local_api_fix https://github.com/ADVRHumanoids/CartesianInterface.git && \
-    cd /home/forest_ws/src/CartesianInterface && \
     mkdir -p /home/forest_ws/build/CartesianInterface && cd /home/forest_ws/build/CartesianInterface && \
     source /opt/ros/noetic/setup.bash && \
     source /home/forest_ws/setup.bash && \
@@ -176,7 +173,6 @@ RUN git clone -b local_api_fix https://github.com/ADVRHumanoids/CartesianInterfa
 
 # cartesio_acceleration_support
 RUN git clone -b 2.0-devel https://github.com/ADVRHumanoids/cartesio_acceleration_support.git && \
-    cd /home/forest_ws/src/cartesio_acceleration_support && \
     mkdir -p /home/forest_ws/build/cartesio_acceleration_support && \ 
     cd /home/forest_ws/build/cartesio_acceleration_support && \ 
     source /opt/ros/noetic/setup.bash && \
@@ -187,7 +183,6 @@ RUN git clone -b 2.0-devel https://github.com/ADVRHumanoids/cartesio_acceleratio
 
 # cartesio_collision_support
 RUN git clone -b 2.0-devel https://github.com/ADVRHumanoids/cartesio_collision_support.git && \
-    cd /home/forest_ws/src/cartesio_collision_support && \
     mkdir -p /home/forest_ws/build/cartesio_collision_support && \
     cd /home/forest_ws/build/cartesio_collision_support && \
     source /opt/ros/noetic/setup.bash && \
