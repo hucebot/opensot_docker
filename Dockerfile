@@ -245,4 +245,6 @@ RUN git clone https://github.com/hucebot/tiago_dual_cartesio_config.git \
 # Little Dog
 RUN git clone https://github.com/EnricoMingo/LittleDog.git
 
+RUN pip install --upgrade scipy
+
 RUN echo 'export ROS_PACKAGE_PATH="${ROS_PACKAGE_PATH}:/home/forest_ws/src/tiago_dual_cartesio_config:/home/forest_ws/src/tiago_dual_robot:/home/forest_ws/src/tiago_dual_description_calibration:/home/forest_ws/src/pal_urdf_utils:/home/forest_ws/src/omni_base_robot:/home/forest_ws/src/tiago_robot:/home/forest_ws/src/hey5_description:/home/forest_ws/src/pmb2_robot:/home/forest_ws/src/pal_gripper:/home/forest_ws/src/LittleDog:/home/forest_ws/src/franka_cartesio_config:/home/forest_ws/src/talos_cartesio_config:/home/forest_ws/src/talos_robot"' >> /home/forest_ws/setup.bash
