@@ -90,11 +90,12 @@ RUN git clone https://github.com/humanoid-path-planner/hpp-fcl.git && \
 WORKDIR /home/forest_ws/src
 RUN git clone https://github.com/stack-of-tasks/pinocchio.git && \
     cd /home/forest_ws/src/pinocchio && \
+    git checkout tags/v3.2.0 && \
     git submodule init && \
     git submodule update && \
     mkdir -p /home/forest_ws/build/pinocchio && \
     cd /home/forest_ws/build/pinocchio && \
-    cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_WITH_URDF_SUPPORT=ON -DBUILD_WITH_COLLISION_SUPPORT=ON -DBUILD_PYTHON_INTERFACE=OFF ../../src/pinocchio && \
+    cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_WITH_URDF_SUPPORT=ON -DBUILD_WITH_COLLISION_SUPPORT=ON -DBUILD_TESTING=FALSE -DBUILD_PYTHON_INTERFACE=OFF ../../src/pinocchio && \
     make -j && \
     make install
 
