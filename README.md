@@ -2,7 +2,8 @@ opensot_docker
 ==============
 A ```DockerFile``` to run the [OpenSoT](https://github.com/ADVRHumanoids/OpenSoT) and [CartesI/O](https://github.com/ADVRHumanoids/CartesianInterface) frameworks.
 
-Build the DockerFile: --------------------- 
+Build the DockerFile:
+--------------------- 
 Run ```docker build -t opensot .``` in the ```opensot_docker``` folder.
 
 It takes around 18 minutes to build.
