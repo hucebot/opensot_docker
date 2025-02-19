@@ -1,0 +1,9 @@
+[submodule "g1_opensot"]
+	path = g1_opensot
+	url = https://github.com/ioloizou/g1_opensot.git
+[submodule "srbd-mpc"]
+	path = srbd-mpc
+	url = https://github.com/ioloizou/srbd-mpc.git
+[submodule "unitree_ros"]
+	path = unitree_ros
+	url = https://github.com/itsikelis/unitree_ros.git
