@@ -4,9 +4,10 @@ xhost +
 isRunning=`docker ps -f name=opensot | grep -c "opensot"`;
 
 if [ $isRunning -eq 0 ]; then
-	docker rm opensot
+	docker remove opensot
 	docker run \
 		--gpus all \
+		--env NVIDIA_DRIVER_CAPABILITIES=all \
 		--name opensot  \
 		--interactive \
 		--tty \
