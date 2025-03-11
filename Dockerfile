@@ -83,7 +83,7 @@ RUN git clone https://github.com/humanoid-path-planner/hpp-fcl.git && \
     mkdir -p /home/forest_ws/build/hpp-fcl && \
     cd /home/forest_ws/build/hpp-fcl && \
     cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_PYTHON_INTERFACE=OFF ../../src/hpp-fcl && \
-    make -j && \
+    make -j2 && \
     make install
 
 ## PINOCCHIO
@@ -96,7 +96,7 @@ RUN git clone https://github.com/stack-of-tasks/pinocchio.git && \
     mkdir -p /home/forest_ws/build/pinocchio && \
     cd /home/forest_ws/build/pinocchio && \
     cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_WITH_URDF_SUPPORT=ON -DBUILD_WITH_COLLISION_SUPPORT=ON -DBUILD_TESTING=FALSE -DBUILD_PYTHON_INTERFACE=OFF ../../src/pinocchio && \
-    make -j && \
+    make -j2 && \
     make install
 
 # xbot_msgs
@@ -111,7 +111,7 @@ RUN git clone https://github.com/ADVRHumanoids/xbot2_interface.git && \
     source /opt/ros/noetic/setup.bash && \
     source /home/forest_ws/setup.bash && \
     cmake -DXBOT2_IFC_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/xbot2_interface && \
-    make -j && \
+    make -j2 && \
     make install
 
 # osqp
@@ -125,7 +125,7 @@ RUN git clone https://github.com/oxfordcontrol/osqp.git && \
     source /opt/ros/noetic/setup.bash && \
     source /home/forest_ws/setup.bash && \
     cmake -DDLONG=OFF -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/osqp && \
-    make -j && \
+    make -j2 && \
     make install
 
 # proxQP
@@ -139,7 +139,7 @@ RUN git clone https://github.com/Simple-Robotics/proxsuite.git && \
     source /opt/ros/noetic/setup.bash && \
     source /home/forest_ws/setup.bash && \
     cmake -DBUILD_WITH_VECTORIZATION_SUPPORT=OFF -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/proxsuite && \
-    make -j && \
+    make -j2 && \
     make install
 
 # opensot
@@ -149,7 +149,7 @@ RUN git clone -b 4.0-devel https://github.com/ADVRHumanoids/OpenSoT.git && \
     source /opt/ros/noetic/setup.bash && \
     source /home/forest_ws/setup.bash && \
     cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release -DOPENSOT_SOTH_FRONT_END=ON ../../src/OpenSoT && \
-    make -j && \
+    make -j2 && \
     make install
 
 # reflexxes
@@ -159,7 +159,7 @@ RUN git clone https://github.com/ADVRHumanoids/RMLTypeII.git && \
     source /opt/ros/noetic/setup.bash && \
     source /home/forest_ws/setup.bash && \
     cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/RMLTypeII && \
-    make -j && \
+    make -j2 && \
     make install
 
 # CartesI/O
@@ -168,7 +168,7 @@ RUN git clone -b local_api_fix https://github.com/ADVRHumanoids/CartesianInterfa
     source /opt/ros/noetic/setup.bash && \
     source /home/forest_ws/setup.bash && \
     cmake -DCARTESIO_COMPILE_EXAMPLES=ON -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/CartesianInterface && \
-    make -j && \
+    make -j2 && \
     make install
 
 # cartesio_acceleration_support
@@ -178,11 +178,13 @@ RUN git clone -b 2.0-devel https://github.com/ADVRHumanoids/cartesio_acceleratio
     source /opt/ros/noetic/setup.bash && \
     source /home/forest_ws/setup.bash && \
     cmake -DCARTESIO_COMPILE_EXAMPLES=ON -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/cartesio_acceleration_support && \
-    make -j && \
+    make -j2 && \
     make install
 
 # cartesio_collision_support
 RUN git clone -b 2.0-devel https://github.com/ADVRHumanoids/cartesio_collision_support.git && \
+    cd /home/forest_ws/src/cartesio_collision_support && \
+    git checkout ab66869ef06a1eb0b05943baefa2707d49deb2cb && \
     mkdir -p /home/forest_ws/build/cartesio_collision_support && \
     cd /home/forest_ws/build/cartesio_collision_support && \
     source /opt/ros/noetic/setup.bash && \
@@ -198,7 +200,7 @@ RUN git clone -b xbot2ifc https://github.com/ADVRHumanoids/centauro_cartesio.git
     source /opt/ros/noetic/setup.bash && \
     source /home/forest_ws/setup.bash && \
     cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/centauro_cartesio && \
-    make -j && \
+    make -j2 && \
     make install
 
 # base_estimation
@@ -208,7 +210,7 @@ RUN git clone -b xbot2ifc https://github.com/ADVRHumanoids/base_estimation.git &
     source /opt/ros/noetic/setup.bash && \
     source /home/forest_ws/setup.bash && \
     cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/base_estimation && \
-    make -j && \
+    make -j2 && \
     make install
 
 # franka_cartesio_config
@@ -235,7 +237,22 @@ RUN git clone https://github.com/hucebot/tiago_dual_cartesio_config.git \
 # Little Dog
 RUN git clone https://github.com/EnricoMingo/LittleDog.git
 
-RUN git clone https://github.com/ioloizou/g1_locomotion.git
+# Unitree G1
+RUN git clone https://github.com/ioloizou/g1_locomotion.git && \
+    cd /home/forest_ws/src/g1_locomotion && \
+    git submodule init && \
+    git submodule update && \
+    mkdir -p /home/forest_ws/build/g1_msgs && \
+    cd /home/forest_ws/build/g1_msgs && \
+    source /opt/ros/noetic/setup.bash && \
+    source /home/forest_ws/setup.bash && \
+    cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/g1_locomotion/g1_msgs && \
+    make -j2 && \
+    make install    
+
+# For graphics
+RUN apt-get update && apt-get install -y mesa-utils
+
 
 RUN pip install --upgrade scipy \
     osqp \
@@ -245,3 +262,4 @@ RUN pip install --upgrade scipy \
 RUN echo 'export ROS_PACKAGE_PATH="${ROS_PACKAGE_PATH}:/home/forest_ws/src/tiago_dual_cartesio_config:/home/forest_ws/src/tiago_dual_robot:/home/forest_ws/src/tiago_dual_description_calibration:/home/forest_ws/src/pal_urdf_utils:/home/forest_ws/src/omni_base_robot:/home/forest_ws/src/tiago_robot:/home/forest_ws/src/hey5_description:/home/forest_ws/src/pmb2_robot:/home/forest_ws/src/pal_gripper:/home/forest_ws/src/LittleDog:/home/forest_ws/src/franka_cartesio_config:/home/forest_ws/src/talos_cartesio_config:/home/forest_ws/src/talos_robot"' >> /home/forest_ws/setup.bash
 
 RUN echo 'export ROS_PACKAGE_PATH="${ROS_PACKAGE_PATH}:/home/forest_ws/src/unitree_ros/robots/g1_description:/home/forest_ws/src/g1_opensot:/home/forest_ws/src/g1_locomotion/g1_mujoco_sim"' >> /home/forest_ws/setup.bash
+
