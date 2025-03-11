@@ -242,13 +242,30 @@ RUN git clone https://github.com/ioloizou/g1_locomotion.git && \
     cd /home/forest_ws/src/g1_locomotion && \
     git submodule init && \
     git submodule update && \
+    ## g1_msgs
     mkdir -p /home/forest_ws/build/g1_msgs && \
     cd /home/forest_ws/build/g1_msgs && \
     source /opt/ros/noetic/setup.bash && \
     source /home/forest_ws/setup.bash && \
     cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/g1_locomotion/g1_msgs && \
     make -j2 && \
-    make install    
+    make install &&\
+    ## g1_mujoco_sim
+    mkdir -p /home/forest_ws/build/g1_mujoco_sim && \
+    cd /home/forest_ws/build/g1_mujoco_sim && \
+    source /opt/ros/noetic/setup.bash && \
+    source /home/forest_ws/setup.bash && \
+    cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/g1_locomotion/g1_mujoco_sim && \
+    make -j2 && \
+    make install &&\
+    ## g1_mpc
+    mkdir -p /home/forest_ws/build/g1_mpc && \
+    cd /home/forest_ws/build/g1_mpc && \
+    source /opt/ros/noetic/setup.bash && \
+    source /home/forest_ws/setup.bash && \
+    cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/g1_locomotion/g1_mpc && \
+    make -j2 && \
+    make install                
 
 # For graphics
 RUN apt-get update && apt-get install -y mesa-utils
