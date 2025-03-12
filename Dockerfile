@@ -270,6 +270,7 @@ RUN git clone https://github.com/ioloizou/g1_locomotion.git && \
 # For graphics
 RUN apt-get update && apt-get install -y mesa-utils
 
+
 RUN pip install --upgrade scipy \
     osqp \
     mujoco \
