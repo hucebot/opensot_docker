@@ -235,11 +235,19 @@ RUN git clone https://github.com/hucebot/tiago_dual_cartesio_config.git \
 # Little Dog
 RUN git clone https://github.com/EnricoMingo/LittleDog.git
 
-# Unitree G1
+# Unitree G1 Locomotion
 RUN git clone https://github.com/ioloizou/g1_locomotion.git && \
     cd /home/forest_ws/src/g1_locomotion && \
     git submodule init && \
     git submodule update && \
+    ## g1_description
+    mkdir -p /home/forest_ws/build/g1_description && \
+    cd /home/forest_ws/build/g1_description && \
+    source /opt/ros/noetic/setup.bash && \
+    source /home/forest_ws/setup.bash && \
+    cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/g1_locomotion/g1_description && \
+    make -j2 && \
+    make install &&\
     ## g1_msgs
     mkdir -p /home/forest_ws/build/g1_msgs && \
     cd /home/forest_ws/build/g1_msgs && \
