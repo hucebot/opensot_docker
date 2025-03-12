@@ -235,6 +235,16 @@ RUN git clone https://github.com/hucebot/tiago_dual_cartesio_config.git \
 # Little Dog
 RUN git clone https://github.com/EnricoMingo/LittleDog.git
 
+
+# For graphics
+RUN apt-get update && apt-get install -y mesa-utils
+
+
+RUN pip install --upgrade scipy \
+osqp \
+mujoco \
+mujoco-python-viewer
+
 # Unitree G1 Locomotion
 RUN git clone https://github.com/ioloizou/g1_locomotion.git && \
     cd /home/forest_ws/src/g1_locomotion && \
@@ -272,16 +282,7 @@ RUN git clone https://github.com/ioloizou/g1_locomotion.git && \
     cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/g1_locomotion/g1_mpc && \
     make -j2 && \
     make install                
-
-# For graphics
-RUN apt-get update && apt-get install -y mesa-utils
-
-
-RUN pip install --upgrade scipy \
-    osqp \
-    mujoco \
-    mujoco-python-viewer
-
+    
 RUN echo 'export ROS_PACKAGE_PATH="${ROS_PACKAGE_PATH}:/home/forest_ws/src/tiago_dual_cartesio_config:/home/forest_ws/src/tiago_dual_robot:/home/forest_ws/src/tiago_dual_description_calibration:/home/forest_ws/src/pal_urdf_utils:/home/forest_ws/src/omni_base_robot:/home/forest_ws/src/tiago_robot:/home/forest_ws/src/hey5_description:/home/forest_ws/src/pmb2_robot:/home/forest_ws/src/pal_gripper:/home/forest_ws/src/LittleDog:/home/forest_ws/src/franka_cartesio_config:/home/forest_ws/src/talos_cartesio_config:/home/forest_ws/src/talos_robot"' >> /home/forest_ws/setup.bash
 
 RUN echo 'export ROS_PACKAGE_PATH="${ROS_PACKAGE_PATH}:/home/forest_ws/src/unitree_ros/robots/g1_description:/home/forest_ws/src/g1_opensot:/home/forest_ws/src/g1_locomotion/g1_mujoco_sim"' >> /home/forest_ws/setup.bash
