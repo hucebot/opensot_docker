@@ -183,14 +183,12 @@ RUN git clone -b 2.0-devel https://github.com/ADVRHumanoids/cartesio_acceleratio
 
 # cartesio_collision_support
 RUN git clone -b 2.0-devel https://github.com/ADVRHumanoids/cartesio_collision_support.git && \
-    cd /home/forest_ws/src/cartesio_collision_support && \
-    git checkout ab66869ef06a1eb0b05943baefa2707d49deb2cb && \
     mkdir -p /home/forest_ws/build/cartesio_collision_support && \
     cd /home/forest_ws/build/cartesio_collision_support && \
     source /opt/ros/noetic/setup.bash && \
     source /home/forest_ws/setup.bash && \
     cmake -DCARTESIO_COMPILE_EXAMPLES=ON -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/cartesio_collision_support && \
-    make -j2 && \
+    make -j4 && \
     make install
 
 # centauro_cartesio
