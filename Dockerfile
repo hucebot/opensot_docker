@@ -237,7 +237,9 @@ RUN git clone https://github.com/EnricoMingo/LittleDog.git
 
 
 # For graphics
-RUN apt-get update && apt-get install -y mesa-utils
+RUN apt-get update && apt-get upgrade -y && apt-get clean  && apt-get install -y mesa-utils \
+    ros-$ROS_DISTRO-plotjuggler-ros \
+    apt-get clean
 
 
 RUN pip install --upgrade scipy \
