@@ -237,13 +237,25 @@ RUN git clone https://github.com/EnricoMingo/LittleDog.git
 
 
 # For graphics
-RUN apt-get update && apt-get install -y mesa-utils
+RUN apt-get update && apt-get install -y mesa-utils\ 
+    ros-noetic-pal-statistics\
+    ros-noetic-plotjuggler-ros
 
 
 RUN pip install --upgrade scipy \
 osqp \
 mujoco \
 mujoco-python-viewer
+
+# Osqp Eigen
+RUN git clone https://github.com/robotology/osqp-eigen.git && \
+    mkdir -p /home/forest_ws/build/osqp-eigen && \
+    cd /home/forest_ws/build/osqp-eigen && \
+    source /opt/ros/noetic/setup.bash && \
+    source /home/forest_ws/setup.bash && \
+    cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/osqp-eigen && \
+    make -j2 && \
+    make install
 
 # Unitree G1 Locomotion
 RUN git clone https://github.com/ioloizou/g1_locomotion.git && \
