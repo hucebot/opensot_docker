@@ -237,10 +237,9 @@ RUN git clone https://github.com/EnricoMingo/LittleDog.git
 
 
 # For graphics
-RUN apt-get update && apt-get install -y mesa-utils\ 
-    ros-noetic-pal-statistics\
+RUN apt-get update && apt-get upgrade -y && apt-get install -y mesa-utils \
+    ros-noetic-pal-statistics \
     ros-noetic-plotjuggler-ros
-
 
 RUN pip install --upgrade scipy \
 osqp \
@@ -300,7 +299,7 @@ RUN echo 'export ROS_PACKAGE_PATH="${ROS_PACKAGE_PATH}:/home/forest_ws/src/tiago
 RUN echo 'export ROS_PACKAGE_PATH="${ROS_PACKAGE_PATH}:/home/forest_ws/src/unitree_ros/robots/g1_description:/home/forest_ws/src/g1_opensot:/home/forest_ws/src/g1_locomotion/g1_mujoco_sim"' >> /home/forest_ws/setup.bash
 
 # GPU support
-RUN echo '__NV_PRIME_RENDER_OFFLOAD=1' >> ~/.bashrc && \
-    echo '__GLX_VENDOR_LIBRARY_NAME=nvidia' >> ~/.bashrc && \
-    echo 'VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/nvidia_icd.json' >> ~/.bashrc && \
+RUN echo 'export __NV_PRIME_RENDER_OFFLOAD=1' >> ~/.bashrc && \
+    echo 'export __GLX_VENDOR_LIBRARY_NAME=nvidia' >> ~/.bashrc && \
+    echo 'export VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/nvidia_icd.json' >> ~/.bashrc && \
     echo 'export __GLX_VENDOR_LIBRARY_NAME=nvidia' >> ~/.bashrc
