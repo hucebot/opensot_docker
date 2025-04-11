@@ -105,7 +105,7 @@ RUN source /opt/ros/noetic/setup.bash && forest grow xbot_msgs --verbose --jobs 
 
 # xbot2_interface
 WORKDIR /home/forest_ws/src
-RUN git clone https://github.com/ADVRHumanoids/xbot2_interface.git && \
+RUN git clone -b environment_mesh https://github.com/ADVRHumanoids/xbot2_interface.git && \
     mkdir -p /home/forest_ws/build/xbot2_interface && \
     cd /home/forest_ws/build/xbot2_interface && \
     source /opt/ros/noetic/setup.bash && \
@@ -182,7 +182,7 @@ RUN git clone -b 2.0-devel https://github.com/ADVRHumanoids/cartesio_acceleratio
     make install
 
 # cartesio_collision_support
-RUN git clone -b 2.0-devel https://github.com/ADVRHumanoids/cartesio_collision_support.git && \
+RUN git clone -b environment_mesh https://github.com/ADVRHumanoids/cartesio_collision_support.git && \
     mkdir -p /home/forest_ws/build/cartesio_collision_support && \
     cd /home/forest_ws/build/cartesio_collision_support && \
     source /opt/ros/noetic/setup.bash && \
@@ -211,6 +211,16 @@ RUN git clone -b xbot2ifc https://github.com/ADVRHumanoids/base_estimation.git &
     make -j && \
     make install
 
+# mesh_viz
+RUN git clone -b devel https://github.com/ADVRHumanoids/mesh_viz.git && \
+    mkdir -p /home/forest_ws/build/mesh_viz && \
+    cd /home/forest_ws/build/mesh_viz && \
+    source /opt/ros/noetic/setup.bash && \
+    source /home/forest_ws/setup.bash && \
+    cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/mesh_viz && \
+    make -j && \
+    make install
+
 # franka_cartesio_config
 WORKDIR /opt/ros/noetic/share/franka_description/robots/panda
 RUN cp panda.urdf.xacro ../ && cd .. && mv panda.urdf.xacro panda_arm.urdf.xacro
@@ -222,7 +232,7 @@ RUN git clone https://github.com/hucebot/talos_cartesio_config.git  \
     &&  git clone https://github.com/pal-robotics/talos_robot.git
 
 ## Tiago
-RUN git clone https://github.com/hucebot/tiago_dual_cartesio_config.git \
+RUN git clone -b environment_mesh https://github.com/hucebot/tiago_dual_cartesio_config.git \
     && git clone -b kinetic-devel https://github.com/EnricoMingo/tiago_dual_robot.git \
     && git clone https://github.com/pal-robotics/tiago_dual_description_calibration.git \ 
     && git clone https://github.com/pal-robotics/pal_urdf_utils.git \
@@ -236,5 +246,7 @@ RUN git clone https://github.com/hucebot/tiago_dual_cartesio_config.git \
 RUN git clone https://github.com/EnricoMingo/LittleDog.git
 
 RUN pip install --upgrade scipy
+
+RUN apt-get install -y ros-noetic-moveit-ros-visualization
 
 RUN echo 'export ROS_PACKAGE_PATH="${ROS_PACKAGE_PATH}:/home/forest_ws/src/tiago_dual_cartesio_config:/home/forest_ws/src/tiago_dual_robot:/home/forest_ws/src/tiago_dual_description_calibration:/home/forest_ws/src/pal_urdf_utils:/home/forest_ws/src/omni_base_robot:/home/forest_ws/src/tiago_robot:/home/forest_ws/src/hey5_description:/home/forest_ws/src/pmb2_robot:/home/forest_ws/src/pal_gripper:/home/forest_ws/src/LittleDog:/home/forest_ws/src/franka_cartesio_config:/home/forest_ws/src/talos_cartesio_config:/home/forest_ws/src/talos_robot"' >> /home/forest_ws/setup.bash
