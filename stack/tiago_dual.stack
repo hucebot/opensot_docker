@@ -1,0 +1,162 @@
+solver_options:
+    regularization: 1e-3
+    back_end: "qpoases"
+
+stack:
+    - ["Base"]
+    - ["Lee", "Ree"]
+    - ["Postural"]
+
+constraints: ["JointLimits", "VelocityLimits", "Base2D", "Collision"]
+
+Gaze:
+    type: "Gaze"
+    distal_link: "head_front_camera_link"
+    base_link: "base_link"
+    lambda: 1.
+    lambda: 0.1
+
+Omni4X:
+    type: "OmniWheels4X"
+    l1: 0.223
+    l2: 0.244
+    wheel_radius: 0.08 
+    base_link: "base_link"
+    joint_wheels_name: ["wheel_front_left_joint", "wheel_front_right_joint", "wheel_rear_left_joint", "wheel_rear_right_joint"]    
+    
+Lee:
+    type: "Cartesian"
+    distal_link: "gripper_left_grasping_frame"
+    base_link: "base_link"
+    lambda: 0.1
+    
+Ree:
+    type: "Cartesian"
+    distal_link: "gripper_right_grasping_frame"
+    base_link: "base_link"
+    lambda: 0.1
+    
+Postural:
+    type: "Postural"
+    lambda: 0.05
+    use_inertia: false
+    weight:
+        reference@v0: 0.0
+        reference@v1: 0.0
+        reference@v2: 0.0
+        reference@v3: 0.0
+        reference@v4: 0.0
+        reference@v5: 0.0
+        wheel_front_left_joint: 0.0 
+        wheel_front_right_joint: 0.0 
+        wheel_rear_left_joint: 0.0 
+        wheel_rear_right_joint: 0.0
+    
+Base:
+    type: "Cartesian"
+    distal_link: "base_link"
+    base_link: "world"
+    lambda: 0.1
+    indices: [0,1,5]
+    
+Base2D:
+    type: "Cartesian"
+    distal_link: "base_link"
+    name: "base_constraint"
+    base_link: "world"
+    lambda: 0.1
+    indices: [2,3,4]
+
+    
+JointLimits:
+    type: "JointLimits"
+    limits:
+        arm_right_1_joint: [-1.1080972450961724, 1.5007963267948965]
+        arm_right_2_joint: [-1.1080972450961724, 1.5007963267948965]
+        arm_right_3_joint: [-0.7153981633974482, 3.8569908169872416]
+        arm_right_4_joint: [-0.32269908169872413, 2.286194490192345]
+        arm_right_5_joint: [-2.0743951023931952, 2.0743951023931952]
+        arm_right_6_joint: [-1.3937166941154069, 1.3937166941154069]
+        arm_right_7_joint: [-2.0743951023931952, 2.0743951023931952]
+        arm_left_1_joint: [-1.1080972450961724, 1.5007963267948965]
+        arm_left_2_joint: [-1.1080972450961724, 1.5007963267948965]
+        arm_left_3_joint: [-0.7153981633974482, 3.8569908169872416]
+        arm_left_4_joint: [-0.32269908169872413, 2.286194490192345]
+        arm_left_5_joint: [-2.0743951023931952, 2.0743951023931952]
+        arm_left_6_joint: [-1.3937166941154069, 1.3937166941154069]
+        arm_left_7_joint: [-2.0743951023931952, 2.0743951023931952]
+
+VelocityLimits:
+    type: "VelocityLimits"
+    
+Collision:
+    type: CollisionConstraint
+    lib_name: libcartesio_collision_support.so
+    bound_scaling: 0.1
+    distance_threshold: 0.01
+    max_pairs: 100
+    collision_urdf_path: $(rospack find tiago_dual_cartesio_config)/capsules/urdf/tiago_dual_capsules.rviz
+    collision_srdf_path: $(rospack find tiago_dual_cartesio_config)/capsules/srdf/tiago_dual_capsules.srdf
+    pairs:
+     - [arm_left_3_link, base_link]
+     - [arm_left_5_link, base_link]
+     - [gripper_left_left_finger_link, base_link]
+     - [gripper_left_right_finger_link, base_link]
+     - [gripper_left_link, base_link]
+     
+     - [arm_left_3_link, head_2_link]
+     - [arm_left_5_link, head_2_link]
+     - [gripper_left_left_finger_link, head_2_link]
+     - [gripper_left_right_finger_link, head_2_link]
+     - [gripper_left_link, head_2_link]
+     
+     - [arm_left_3_link, torso_lift_link]
+     - [arm_left_5_link, torso_lift_link]
+     - [gripper_left_left_finger_link, torso_lift_link]
+     - [gripper_left_right_finger_link, torso_lift_link]
+     - [gripper_left_link, torso_lift_link]
+     
+     - [arm_right_3_link, base_link]
+     - [arm_right_5_link, base_link]
+     - [gripper_right_left_finger_link, base_link]
+     - [gripper_right_right_finger_link, base_link]
+     - [gripper_right_link, base_link]
+     
+     - [arm_right_3_link, head_2_link]
+     - [arm_right_5_link, head_2_link]
+     - [gripper_right_left_finger_link, head_2_link]
+     - [gripper_right_right_finger_link, head_2_link]
+     - [gripper_right_link, head_2_link]
+     
+     - [arm_right_3_link, torso_lift_link]
+     - [arm_right_5_link, torso_lift_link]
+     - [gripper_right_left_finger_link, torso_lift_link]
+     - [gripper_right_right_finger_link, torso_lift_link]
+     - [gripper_right_link, torso_lift_link]
+     
+     - [gripper_right_left_finger_link, gripper_left_left_finger_link]
+     - [gripper_right_left_finger_link, gripper_left_right_finger_link]
+     - [gripper_right_right_finger_link, gripper_left_left_finger_link]
+     - [gripper_right_right_finger_link, gripper_left_right_finger_link]
+     - [gripper_right_left_finger_link, gripper_left_link]
+     - [gripper_right_right_finger_link, gripper_left_link]
+     - [gripper_left_left_finger_link, gripper_right_link]
+     - [gripper_left_right_finger_link, gripper_right_link]
+     - [gripper_left_link, gripper_right_link]
+     
+     - [gripper_left_link, arm_right_5_link]
+     - [gripper_right_link, arm_left_5_link]
+     - [arm_left_5_link, arm_right_5_link]
+     - [arm_left_5_link, arm_right_4_link]
+     - [arm_left_4_link, arm_right_5_link]
+     - [gripper_left_link, arm_right_4_link]
+     - [gripper_left_link, arm_right_5_link]
+     - [gripper_right_link, arm_left_4_link]
+     - [gripper_right_link, arm_left_5_link]
+     
+     - [torso_fixed_column_link, gripper_right_left_finger_link]
+     - [torso_fixed_column_link, gripper_right_right_finger_link]
+     - [torso_fixed_column_link, gripper_left_left_finger_link]
+     - [torso_fixed_column_link, gripper_left_right_finger_link]
+     
+     
