@@ -15,7 +15,6 @@ if [ $isRunning -eq 0 ]; then
 		--privileged \
 		--volume /tmp/.X11-unix:/tmp/.X11-unix \
 		--volume $(pwd)/code:/home/forest_ws/code \
-		--volume /home/enrico/Qt/:/home/Qt \
 		opensot_ros2
 
 else
