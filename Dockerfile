@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM osrf/ros:jazzy-desktop
 
 SHELL ["/bin/bash", "-c"]
 
@@ -7,72 +7,32 @@ ENV TZ="Europe/Paris"
 
 WORKDIR /deps
 
-# Install required packages
-RUN apt-get update && apt-get upgrade -y && apt-get clean  && apt-get install -y g++-10 python3-dev \
-    python-is-python3 \
-    python3-pip \
-    git \
-    ninja-build \
-    cmake \
-    gedit \
-    build-essential \
-    libopenblas-dev \
-    clang unzip \
-    curl \
-    wget \
-    software-properties-common \
-    bash-completion \
-    libx11-dev \
-    python3-tk \
-    neovim \
-    libc++-dev \
-    libc++abi-dev \
-    libomp-dev \
-    xorg-dev \
-    libxcb-shm0 \
-    libglu1-mesa-dev \
-    libc++-dev \
-    libc++abi-dev \
-    libsdl2-dev \
-    libxi-dev \
-    libtbb-dev \
-    libosmesa6-dev \
-    libudev-dev \
-    autoconf \
-    libtool \
-    libglew-dev \
-    locate\
-    nano \
-    cmake-curses-gui \
-    ffmpeg && \
-    apt-get clean
-    
-RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+RUN apt-get update && apt-get upgrade -y && apt-get clean  && apt-get install -y terminator gedit locate cmake-curses-gui python3-pip python3-venv liburdfdom-dev ros-jazzy-moveit-core 
 
-RUN curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add -
+WORKDIR /home
+RUN echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc
 
-RUN apt-get update && apt-get install -y ros-noetic-desktop-full ros-noetic-srdfdom \
-	  ros-noetic-urdf ros-noetic-geometric-shapes ros-noetic-moveit-core ros-noetic-franka-ros ros-noetic-rosmon terminator \
-	  ros-noetic-moveit-ros-planning ros-noetic-moveit-ros-planning-interface
-
-RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
- 
 # create forest ws and use it to clone and install CONCERT's simulation package
 WORKDIR /home/forest_ws
 ENV HHCM_FOREST_CLONE_DEFAULT_PROTO=https
 ENV PYTHONUNBUFFERED=1
 
-RUN pip install --upgrade ttictoc hhcm-forest && forest init
-RUN echo "source $PWD/setup.bash" >> ~/.bashrc
+# create python virtual env
+RUN python3 -m venv /home/.base
+RUN echo "source /home/.base/bin/activate" >> ~/.bashrc
+SHELL ["bash", "-ic"]
 
-RUN forest add-recipes git@github.com:advrhumanoids/multidof_recipes.git 
+RUN pip install --upgrade ttictoc setuptools hhcm-forest && forest init
+RUN echo "source $PWD/setup.bash" >> ~/.bashrc
+SHELL ["bash", "-ic"]
+
+RUN forest add-recipes git@github.com:advrhumanoids/multidof_recipes.git --tag ros2
 
 # pre-install pybind11 and custom matlogger2 
-RUN forest grow pybind11 --verbose --jobs 4 --pwd user && \
-    forest grow matlogger2 --verbose --jobs 4 --pwd user
-
-
-## HPP-FCL
+#RUN forest grow pybind11 --verbose --jobs 4 --pwd user && \
+RUN forest grow matlogger2 --verbose --jobs 4 --pwd user
+    
+# HPP-FCL
 WORKDIR /home/forest_ws/src
 RUN git clone https://github.com/humanoid-path-planner/hpp-fcl.git && \
     ls -a && \
@@ -82,38 +42,38 @@ RUN git clone https://github.com/humanoid-path-planner/hpp-fcl.git && \
     git submodule update && \
     mkdir -p /home/forest_ws/build/hpp-fcl && \
     cd /home/forest_ws/build/hpp-fcl && \
+    source /opt/ros/jazzy/setup.bash && \
+    source /home/forest_ws/setup.bash && \
     cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_PYTHON_INTERFACE=OFF ../../src/hpp-fcl && \
-    make -j && \
+    make -j8 && \
     make install
 
 ## PINOCCHIO
 WORKDIR /home/forest_ws/src
-RUN git clone https://github.com/stack-of-tasks/pinocchio.git && \
+RUN git clone -b devel https://github.com/stack-of-tasks/pinocchio.git && \
     cd /home/forest_ws/src/pinocchio && \
-    git checkout tags/v3.2.0 && \
     git submodule init && \
     git submodule update && \
     mkdir -p /home/forest_ws/build/pinocchio && \
     cd /home/forest_ws/build/pinocchio && \
+    source /opt/ros/jazzy/setup.bash && \
+    source /home/forest_ws/setup.bash && \
     cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_WITH_URDF_SUPPORT=ON -DBUILD_WITH_COLLISION_SUPPORT=ON -DBUILD_TESTING=FALSE -DBUILD_PYTHON_INTERFACE=OFF ../../src/pinocchio && \
-    make -j && \
+    make -j8 && \
     make install
-
-# xbot_msgs
-WORKDIR /home/forest_ws
-RUN source /opt/ros/noetic/setup.bash && forest grow xbot_msgs --verbose --jobs 4 --pwd user
+    
 
 # xbot2_interface
 WORKDIR /home/forest_ws/src
-RUN git clone https://github.com/ADVRHumanoids/xbot2_interface.git && \
+RUN git clone -b devel https://github.com/ADVRHumanoids/xbot2_interface.git && \
     mkdir -p /home/forest_ws/build/xbot2_interface && \
     cd /home/forest_ws/build/xbot2_interface && \
-    source /opt/ros/noetic/setup.bash && \
+    source /opt/ros/jazzy/setup.bash && \
     source /home/forest_ws/setup.bash && \
-    cmake -DXBOT2_IFC_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/xbot2_interface && \
-    make -j && \
+    cmake -DXBOT2_IFC_BUILD_TESTS=ON -DXBOT2_IFC_BUILD_ROS=OFF -DXBOT2_IFC_BUILD_ROS2=OFF -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/xbot2_interface && \
+    make -j8 && \
     make install
-
+    
 # osqp
 RUN git clone https://github.com/oxfordcontrol/osqp.git && \
     cd /home/forest_ws/src/osqp && \
@@ -122,10 +82,10 @@ RUN git clone https://github.com/oxfordcontrol/osqp.git && \
     git submodule update && \
     mkdir -p /home/forest_ws/build/osqp && \
     cd /home/forest_ws/build/osqp && \
-    source /opt/ros/noetic/setup.bash && \
+    source /opt/ros/jazzy/setup.bash && \
     source /home/forest_ws/setup.bash && \
     cmake -DDLONG=OFF -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/osqp && \
-    make -j && \
+    make -j8 && \
     make install
 
 # proxQP
@@ -136,105 +96,64 @@ RUN git clone https://github.com/Simple-Robotics/proxsuite.git && \
     git submodule update && \
     mkdir -p /home/forest_ws/build/proxsuite && \
     cd /home/forest_ws/build/proxsuite && \
-    source /opt/ros/noetic/setup.bash && \
+    source /opt/ros/jazzy/setup.bash && \
     source /home/forest_ws/setup.bash && \
     cmake -DBUILD_WITH_VECTORIZATION_SUPPORT=OFF -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/proxsuite && \
-    make -j && \
+    make -j8 && \
     make install
+    
+RUN apt-get update && apt-get upgrade -y && apt-get clean  && apt-get install -y libxcb-cursor0 gdb
 
-# opensot
-RUN git clone -b 4.0-devel https://github.com/ADVRHumanoids/OpenSoT.git && \
-    mkdir -p /home/forest_ws/build/OpenSoT && \
-    cd /home/forest_ws/build/OpenSoT && \
-    source /opt/ros/noetic/setup.bash && \
-    source /home/forest_ws/setup.bash && \
-    cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release -DOPENSOT_SOTH_FRONT_END=ON ../../src/OpenSoT && \
-    make -j && \
-    make install
-
-# reflexxes
-RUN git clone https://github.com/ADVRHumanoids/RMLTypeII.git && \
-    mkdir -p /home/forest_ws/build/RMLTypeII && \
-    cd /home/forest_ws/build/RMLTypeII && \
-    source /opt/ros/noetic/setup.bash && \
-    source /home/forest_ws/setup.bash && \
-    cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/RMLTypeII && \
-    make -j && \
-    make install
-
-# CartesI/O
-RUN git clone -b local_api_fix https://github.com/ADVRHumanoids/CartesianInterface.git && \
-    mkdir -p /home/forest_ws/build/CartesianInterface && cd /home/forest_ws/build/CartesianInterface && \
-    source /opt/ros/noetic/setup.bash && \
-    source /home/forest_ws/setup.bash && \
-    cmake -DCARTESIO_COMPILE_EXAMPLES=ON -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/CartesianInterface && \
-    make -j && \
-    make install
-
-# cartesio_acceleration_support
-RUN git clone -b 2.0-devel https://github.com/ADVRHumanoids/cartesio_acceleration_support.git && \
-    mkdir -p /home/forest_ws/build/cartesio_acceleration_support && \ 
-    cd /home/forest_ws/build/cartesio_acceleration_support && \ 
-    source /opt/ros/noetic/setup.bash && \
-    source /home/forest_ws/setup.bash && \
-    cmake -DCARTESIO_COMPILE_EXAMPLES=ON -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/cartesio_acceleration_support && \
-    make -j && \
-    make install
-
-# cartesio_collision_support
-RUN git clone -b 2.0-devel https://github.com/ADVRHumanoids/cartesio_collision_support.git && \
-    mkdir -p /home/forest_ws/build/cartesio_collision_support && \
-    cd /home/forest_ws/build/cartesio_collision_support && \
-    source /opt/ros/noetic/setup.bash && \
-    source /home/forest_ws/setup.bash && \
-    cmake -DCARTESIO_COMPILE_EXAMPLES=ON -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/cartesio_collision_support && \
-    make -j && \
-    make install
-
-# centauro_cartesio
-RUN git clone -b xbot2ifc https://github.com/ADVRHumanoids/centauro_cartesio.git && \
-    mkdir -p /home/forest_ws/build/centauro_cartesio && \
-    cd /home/forest_ws/build/centauro_cartesio && \
-    source /opt/ros/noetic/setup.bash && \
-    source /home/forest_ws/setup.bash && \
-    cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/centauro_cartesio && \
-    make -j && \
-    make install
-
-# base_estimation
-RUN git clone -b xbot2ifc https://github.com/ADVRHumanoids/base_estimation.git && \
-    mkdir -p /home/forest_ws/build/base_estimation && \
-    cd /home/forest_ws/build/base_estimation && \
-    source /opt/ros/noetic/setup.bash && \
-    source /home/forest_ws/setup.bash && \
-    cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/base_estimation && \
-    make -j && \
-    make install
-
-# franka_cartesio_config
-WORKDIR /opt/ros/noetic/share/franka_description/robots/panda
-RUN cp panda.urdf.xacro ../ && cd .. && mv panda.urdf.xacro panda_arm.urdf.xacro
+# FCL v0.6.0 THIS IS REQUIRED TO RUN TESTS IN OPENSOT! THIS MAY CONFLICT WITH fcl v0.7 installed by default!
 WORKDIR /home/forest_ws/src
-RUN git clone -b xbot2ifc https://github.com/EnricoMingo/franka_cartesio_config.git
+RUN git clone -b v0.6.0 https://github.com/flexible-collision-library/fcl.git && \
+    mkdir -p /home/forest_ws/build/fcl && \
+    cd /home/forest_ws/build/fcl && \
+    source /opt/ros/jazzy/setup.bash && \
+    source /home/forest_ws/setup.bash && \
+    cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/fcl  && \
+    make -j8 && \
+    make install
+#MANUALLY ADDING missing fclConfigVersion.cmake to retieve version informations of FCL
+RUN FCL_VERSION=0.6.1 && \
+    CONFIG_DIR=/home/forest_ws/install/lib/cmake/fcl && \
+    mkdir -p "$CONFIG_DIR" && \
+    echo "set(PACKAGE_VERSION \"$FCL_VERSION\")" > "$CONFIG_DIR/fclConfigVersion.cmake" && \
+    echo "" >> "$CONFIG_DIR/fclConfigVersion.cmake" && \
+    echo "if(PACKAGE_FIND_VERSION)" >> "$CONFIG_DIR/fclConfigVersion.cmake" && \
+    echo "  if(PACKAGE_VERSION VERSION_LESS PACKAGE_FIND_VERSION)" >> "$CONFIG_DIR/fclConfigVersion.cmake" && \
+    echo "    set(PACKAGE_VERSION_COMPATIBLE FALSE)" >> "$CONFIG_DIR/fclConfigVersion.cmake" && \
+    echo "  else()" >> "$CONFIG_DIR/fclConfigVersion.cmake" && \
+    echo "    set(PACKAGE_VERSION_COMPATIBLE TRUE)" >> "$CONFIG_DIR/fclConfigVersion.cmake" && \
+    echo "    if(PACKAGE_VERSION VERSION_EQUAL PACKAGE_FIND_VERSION)" >> "$CONFIG_DIR/fclConfigVersion.cmake" && \
+    echo "      set(PACKAGE_VERSION_EXACT TRUE)" >> "$CONFIG_DIR/fclConfigVersion.cmake" && \
+    echo "    endif()" >> "$CONFIG_DIR/fclConfigVersion.cmake" && \
+    echo "  endif()" >> "$CONFIG_DIR/fclConfigVersion.cmake" && \
+    echo "endif()" >> "$CONFIG_DIR/fclConfigVersion.cmake"
 
-# Talos
-RUN git clone https://github.com/hucebot/talos_cartesio_config.git  \
-    &&  git clone https://github.com/pal-robotics/talos_robot.git
 
-## Tiago
-RUN git clone https://github.com/hucebot/tiago_dual_cartesio_config.git \
-    && git clone -b kinetic-devel https://github.com/EnricoMingo/tiago_dual_robot.git \
-    && git clone https://github.com/pal-robotics/tiago_dual_description_calibration.git \ 
-    && git clone https://github.com/pal-robotics/pal_urdf_utils.git \
-    && git clone -b melodic-devel https://github.com/pal-robotics/omni_base_robot.git \
-    && git clone -b foxy-devel https://github.com/pal-robotics/tiago_robot.git \
-    && git clone -b humble-devel https://github.com/pal-robotics/hey5_description.git \
-    && git clone -b humble-devel https://github.com/pal-robotics/pmb2_robot.git \
-    && git clone -b humble-devel https://github.com/EnricoMingo/pal_gripper.git
+# qpSWIFT
+RUN git clone https://github.com/qpSWIFT/qpSWIFT.git && \
+    mkdir -p /home/forest_ws/build/qpSWIFT && \
+    cd /home/forest_ws/build/qpSWIFT && \
+    source /opt/ros/jazzy/setup.bash && \
+    source /home/forest_ws/setup.bash && \
+    cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/qpSWIFT && \
+    make -j8 && \
+    make install
 
-# Little Dog
-RUN git clone https://github.com/EnricoMingo/LittleDog.git
+RUN apt-get update && apt-get upgrade -y && apt-get clean  && apt-get install -y ros-jazzy-xacro ros-jazzy-joint-state-publisher-gui
 
-RUN pip install --upgrade scipy
+WORKDIR /home 
+RUN echo "export PYTHONPATH=${PYTHONPATH}:/root/.local/lib/python3.12/site-packages:/usr/lib/python3/dist-packages/" >> ~/.bashrc
 
-RUN echo 'export ROS_PACKAGE_PATH="${ROS_PACKAGE_PATH}:/home/forest_ws/src/tiago_dual_cartesio_config:/home/forest_ws/src/tiago_dual_robot:/home/forest_ws/src/tiago_dual_description_calibration:/home/forest_ws/src/pal_urdf_utils:/home/forest_ws/src/omni_base_robot:/home/forest_ws/src/tiago_robot:/home/forest_ws/src/hey5_description:/home/forest_ws/src/pmb2_robot:/home/forest_ws/src/pal_gripper:/home/forest_ws/src/LittleDog:/home/forest_ws/src/franka_cartesio_config:/home/forest_ws/src/talos_cartesio_config:/home/forest_ws/src/talos_robot"' >> /home/forest_ws/setup.bash
+RUN mkdir -p /ros2_ws/src
+
+WORKDIR /home/ros2_ws/src
+RUN git clone https://github.com/frankarobotics/franka_description.git
+RUN git clone -b ros2 https://github.com/EnricoMingo/LittleDog.git
+WORKDIR /home/ros2_ws
+RUN colcon build
+RUN echo "source /home/ros2_ws/install/local_setup.bash" >> ~/.bashrc
+
+WORKDIR /home
