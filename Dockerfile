@@ -152,6 +152,7 @@ RUN mkdir -p /ros2_ws/src
 WORKDIR /home/ros2_ws/src
 RUN git clone https://github.com/frankarobotics/franka_description.git
 RUN git clone -b ros2 https://github.com/EnricoMingo/LittleDog.git
+RUN git clone -b ros2 https://github.com/EnricoMingo/franka_cartesio_config.git
 WORKDIR /home/ros2_ws
 RUN colcon build
 RUN echo "source /home/ros2_ws/install/local_setup.bash" >> ~/.bashrc
