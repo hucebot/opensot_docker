@@ -6,6 +6,7 @@ isRunning=`docker ps -f name=opensot_ros2 | grep -c "opensot_ros2"`;
 if [ $isRunning -eq 0 ]; then
 	docker rm opensot_ros2
 	docker run \
+		--security-opt seccomp=unconfined \
 		--name opensot_ros2  \
 		--interactive \
 		--tty \

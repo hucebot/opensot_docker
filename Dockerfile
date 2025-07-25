@@ -142,7 +142,7 @@ RUN git clone https://github.com/qpSWIFT/qpSWIFT.git && \
     make -j8 && \
     make install
 
-RUN apt-get update && apt-get upgrade -y && apt-get clean  && apt-get install -y ros-jazzy-xacro ros-jazzy-joint-state-publisher-gui libglpk-dev
+RUN apt-get update && apt-get upgrade -y && apt-get clean  && apt-get install -y ros-jazzy-xacro ros-jazzy-joint-state-publisher-gui libglpk-dev libopenblas-dev
 
 WORKDIR /home 
 RUN echo "export PYTHONPATH=${PYTHONPATH}:/root/.local/lib/python3.12/site-packages:/usr/lib/python3/dist-packages/" >> ~/.bashrc
@@ -150,9 +150,11 @@ RUN echo "export PYTHONPATH=${PYTHONPATH}:/root/.local/lib/python3.12/site-packa
 RUN mkdir -p /ros2_ws/src
 
 WORKDIR /home/ros2_ws/src
+RUN git clone -b ros2 https://github.com/EnricoMingo/iit-coman-ros-pkg.git
 RUN git clone https://github.com/frankarobotics/franka_description.git
-RUN git clone -b ros2 https://github.com/EnricoMingo/LittleDog.git
 RUN git clone -b ros2 https://github.com/EnricoMingo/franka_cartesio_config.git
+RUN git clone -b ros2 https://github.com/EnricoMingo/LittleDog.git
+
 WORKDIR /home/ros2_ws
 RUN colcon build
 RUN echo "source /home/ros2_ws/install/local_setup.bash" >> ~/.bashrc
