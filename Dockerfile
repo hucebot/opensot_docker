@@ -91,7 +91,7 @@ RUN git clone https://github.com/oxfordcontrol/osqp.git && \
 # proxQP
 RUN git clone https://github.com/Simple-Robotics/proxsuite.git && \
     cd /home/forest_ws/src/proxsuite && \
-    git checkout f19f07b51f66268db1f16cbeb538e891bb6d4e21 && \
+    git checkout 9f58ebd7bf42fb364de995d25679dc3f675dee7f && \
     git submodule init && \
     git submodule update && \
     mkdir -p /home/forest_ws/build/proxsuite && \
