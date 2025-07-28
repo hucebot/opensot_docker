@@ -155,6 +155,13 @@ RUN git clone https://github.com/frankarobotics/franka_description.git
 RUN git clone -b ros2 https://github.com/EnricoMingo/franka_cartesio_config.git
 RUN git clone -b ros2 https://github.com/EnricoMingo/LittleDog.git
 
+RUN git clone -b humble-devel https://github.com/pal-robotics/pmb2_robot.git
+RUN git clone -b humble-devel https://github.com/pal-robotics/tiago_robot.git
+RUN git clone -b humble-devel https://github.com/pal-robotics/tiago_dual_robot.git
+RUN git clone -b humble-devel https://github.com/pal-robotics/omni_base_robot.git
+RUN git clone -b humble-devel https://github.com/pal-robotics/pal_gripper.git
+RUN git clone -b ros2 https://github.com/hucebot/tiago_dual_cartesio_config.git
+
 WORKDIR /home/ros2_ws
 RUN colcon build
 RUN echo "source /home/ros2_ws/install/local_setup.bash" >> ~/.bashrc
