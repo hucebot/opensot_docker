@@ -4,7 +4,7 @@ xhost +
 isRunning=`docker ps -f name=opensot | grep -c "opensot"`;
 
 if [ $isRunning -eq 0 ]; then
-	docker remove opensot
+	#docker remove opensot
 	docker run \
 		--gpus 'all,"capabilities=compute,utility,graphics"' \
 		--env NVIDIA_DRIVER_CAPABILITIES=all \
