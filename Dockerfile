@@ -142,9 +142,43 @@ RUN git clone https://github.com/qpSWIFT/qpSWIFT.git && \
     make -j8 && \
     make install
 
-RUN apt-get update && apt-get upgrade -y && apt-get clean  && apt-get install -y ros-jazzy-xacro ros-jazzy-joint-state-publisher-gui libglpk-dev libopenblas-dev
+
+# BLASFEO
+RUN git clone https://github.com/giaf/blasfeo && \
+    mkdir -p /home/forest_ws/build/blasfeo && \
+    cd /home/forest_ws/build/blasfeo && \
+    source /opt/ros/jazzy/setup.bash && \
+    source /home/forest_ws/setup.bash && \
+    cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_SHARED_LIBS=ON -DBLASFEO_EXAMPLES=OFF ../../src/blasfeo && \
+    make -j8 && \
+    make install
+
+
+# HPIPM # this version is compatible with hpipm-cpp
+RUN git clone https://github.com/giaf/hpipm && \
+    cd /home/forest_ws/src/hpipm && \
+    git checkout 5dd34e66ae884ae7c8cecad8863949380643c168 && \ 
+    mkdir -p /home/forest_ws/build/hpipm && \
+    cd /home/forest_ws/build/hpipm && \
+    source /opt/ros/jazzy/setup.bash && \
+    source /home/forest_ws/setup.bash && \
+    cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_SHARED_LIBS=ON -DHPIPM_TESTING=OFF -DHPIPM_FIND_BLASFEO=ON ../../src/hpipm && \
+    make -j8 && \
+    make install
+    
+# HPIPM C++
+RUN git clone https://github.com/mayataka/hpipm-cpp && \
+    mkdir -p /home/forest_ws/build/hpipm-cpp && \
+    cd /home/forest_ws/build/hpipm-cpp && \
+    source /opt/ros/jazzy/setup.bash && \
+    source /home/forest_ws/setup.bash && \
+    cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/hpipm-cpp && \
+    make -j8 && \
+    make install
+
 
 WORKDIR /home 
+RUN apt-get update && apt-get upgrade -y && apt-get clean  && apt-get install -y ros-jazzy-xacro ros-jazzy-joint-state-publisher-gui libglpk-dev libopenblas-dev
 RUN echo "export PYTHONPATH=${PYTHONPATH}:/root/.local/lib/python3.12/site-packages:/usr/lib/python3/dist-packages/" >> ~/.bashrc
 
 RUN mkdir -p /ros2_ws/src
@@ -161,6 +195,8 @@ RUN git clone -b humble-devel https://github.com/pal-robotics/tiago_dual_robot.g
 RUN git clone -b humble-devel https://github.com/pal-robotics/omni_base_robot.git
 RUN git clone -b humble-devel https://github.com/pal-robotics/pal_gripper.git
 RUN git clone -b ros2 https://github.com/hucebot/tiago_dual_cartesio_config.git
+
+RUN git clone https://github.com/hucebot/hurobots.git
 
 WORKDIR /home/ros2_ws
 RUN colcon build
