@@ -159,7 +159,7 @@ RUN git clone https://github.com/giaf/hpipm && \
     make install
     
 # HPIPM C++
-RUN git clone https://github.com/mayataka/hpipm-cpp && \
+RUN git clone https://github.com/hucebot/hpipm-cpp.git && \
     mkdir -p /home/forest_ws/build/hpipm-cpp && \
     cd /home/forest_ws/build/hpipm-cpp && \
     source /opt/ros/jazzy/setup.bash && \
@@ -167,10 +167,21 @@ RUN git clone https://github.com/mayataka/hpipm-cpp && \
     cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/hpipm-cpp && \
     make -j8 && \
     make install
+    
+# mujoco
+RUN git clone https://github.com/deepmind/mujoco.git && \
+    mkdir -p /home/forest_ws/build/mujoco && \
+    cd /home/forest_ws/build/mujoco && \
+    source /opt/ros/jazzy/setup.bash && \
+    source /home/forest_ws/setup.bash && \
+    #cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DMUJOCO_BUILD_EXAMPLES=OFF -DMUJOCO_BUILD_TESTS=OFF ../../src/mujoco && \
+    cmake -DMUJOCO_BUILD_EXAMPLES=OFF -DMUJOCO_BUILD_TESTS=OFF ../../src/mujoco && \
+    make -j8 && \
+    make install
 
 
 WORKDIR /home 
-RUN apt-get update && apt-get upgrade -y && apt-get clean  && apt-get install -y ros-jazzy-xacro ros-jazzy-joint-state-publisher-gui libglpk-dev libopenblas-dev
+RUN apt-get update && apt-get upgrade -y && apt-get clean  && apt-get install -y ros-jazzy-xacro ros-jazzy-joint-state-publisher-gui libglpk-dev libopenblas-dev ros-jazzy-rosidl-generator-dds-idl
 RUN echo "export PYTHONPATH=${PYTHONPATH}:/root/.local/lib/python3.12/site-packages:/usr/lib/python3/dist-packages/" >> ~/.bashrc
 
 RUN mkdir -p /ros2_ws/src
@@ -188,7 +199,8 @@ RUN git clone -b humble-devel https://github.com/pal-robotics/omni_base_robot.gi
 RUN git clone -b humble-devel https://github.com/pal-robotics/pal_gripper.git
 RUN git clone -b ros2 https://github.com/hucebot/tiago_dual_cartesio_config.git
 
-RUN git clone https://github.com/hucebot/hurobots.git
+RUN git clone https://github.com/unitreerobotics/unitree_ros2.git
+RUN git clone -b sami https://github.com/itsikelis/huro.git
 
 WORKDIR /home/ros2_ws
 RUN colcon build
