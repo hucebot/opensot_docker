@@ -1,13 +1,13 @@
 # For graphics
 xhost +
 
-isRunning=`docker ps -f name=opensot | grep -c "opensot"`;
+isRunning=`docker ps -f name=opensot_caps | grep -c "opensot_caps"`;
 
 if [ $isRunning -eq 0 ]; then
-	docker rm opensot
+	docker rm opensot_caps
 	docker run \
 		--security-opt seccomp=unconfined \
-		--name opensot  \
+		--name opensot_caps  \
 		--interactive \
 		--tty \
 		--net host \
@@ -18,9 +18,10 @@ if [ $isRunning -eq 0 ]; then
 		--volume /tmp/.X11-unix:/tmp/.X11-unix \
 		--volume $(pwd)/code:/home/forest_ws/code \
 		--volume /home/enrico/Qt/:/home/Qt \
-		opensot
+		--volume $(pwd)/code/climbingrobot_description:/home/ros2_ws/src/climbingrobot_description \
+		opensot_caps
 
 else
     echo "Docker already running."
-    docker exec -it opensot /bin/bash
+    docker exec -it opensot_caps /bin/bash
 fi
