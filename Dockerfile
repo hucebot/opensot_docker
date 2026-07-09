@@ -1,4 +1,4 @@
-FROM osrf/ros:humble-desktop
+FROM ubuntu:22.04
 
 SHELL ["/bin/bash", "-c"]
 
@@ -7,228 +7,113 @@ ENV TZ="Europe/Paris"
 
 WORKDIR /deps
 
-RUN apt-get update && apt-get upgrade -y && apt-get clean  && apt-get install -y terminator gedit locate cmake-curses-gui python3-pip python3-venv liburdfdom-dev ros-humble-moveit-core 
+RUN apt-get update && apt-get upgrade -y && apt-get clean  && apt-get install -y terminator gedit locate cmake-curses-gui python3-pip python3-venv liburdfdom-dev git-all libeigen3-dev libboost-all-dev libhdf5-dev liboctomap-dev octovis libassimp-dev
 
 WORKDIR /home
-RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
-
-# create forest ws and use it to clone and install CONCERT's simulation package
-WORKDIR /home/forest_ws
-ENV HHCM_FOREST_CLONE_DEFAULT_PROTO=https
-ENV PYTHONUNBUFFERED=1
 
 # create python virtual env
 RUN python3 -m venv /home/.base
 RUN echo "source /home/.base/bin/activate" >> ~/.bashrc
 SHELL ["bash", "-ic"]
 
-RUN pip3 install --upgrade jinja2 typeguard ttictoc "setuptools<81" hhcm-forest && forest init
-RUN echo "source $PWD/setup.bash" >> ~/.bashrc
-SHELL ["bash", "-ic"]
+RUN pip3 install --upgrade jinja2 typeguard ttictoc "setuptools<81"
 
-RUN forest add-recipes git@github.com:advrhumanoids/multidof_recipes.git --tag ros2
 
-# pre-install pybind11 and custom matlogger2 
-#RUN forest grow pybind11 --verbose --jobs 4 --pwd user && \
-RUN forest grow matlogger2 --verbose --jobs 4 --pwd user
+WORKDIR /home/src/
+RUN git clone -b master https://github.com/hucebot/MatLogger2.git && \
+    mkdir -p /home/build/MatLogger2 && \
+    cd /home/build/MatLogger2 && \
+    cmake -DCMAKE_BUILD_TYPE:STRING=Release ../../src/MatLogger2 && \
+    make -j8 && \
+    make install
     
-# HPP-FCL
-#WORKDIR /home/forest_ws/src
-#RUN git clone https://github.com/humanoid-path-planner/hpp-fcl.git && \
-#    ls -a && \
-#    cd /home/forest_ws/src/hpp-fcl && \
-#    git checkout 45e60ca7ba81e5394605f8c1097c016245d221c2 && \
-#    git submodule init && \
-#    git submodule update && \
-#    mkdir -p /home/forest_ws/build/hpp-fcl && \
-#    cd /home/forest_ws/build/hpp-fcl && \
-#    source /opt/ros/humble/setup.bash && \
-#    source /home/forest_ws/setup.bash && \
-#    cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_PYTHON_INTERFACE=OFF ../../src/hpp-fcl && \
-#    make -j8 && \
-#    make install
-
-
-# COAL
-WORKDIR /home/forest_ws/src
+WORKDIR /home/src
 RUN git clone -b devel https://github.com/coal-library/coal.git && \
     ls -a && \
-    cd /home/forest_ws/src/coal && \
+    cd /home/src/coal && \
+    git checkout 9856e007971225d6948a8feff6da5b36cc6beacd && \
     git submodule init && \
     git submodule update && \
-    mkdir -p /home/forest_ws/build/coal && \
-    cd /home/forest_ws/build/coal && \
-    source /opt/ros/humble/setup.bash && \
-    source /home/forest_ws/setup.bash && \
-    cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_PYTHON_INTERFACE=OFF ../../src/coal && \
+    mkdir -p /home/build/coal && \
+    cd /home/build/coal && \
+    cmake -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_PYTHON_INTERFACE=OFF ../../src/coal && \
     make -j8 && \
     make install
-
-
-## PINOCCHIO
-WORKDIR /home/forest_ws/src
+    
+# this version allows still to use aligned_vector
+WORKDIR /home/src
 RUN git clone -b devel https://github.com/stack-of-tasks/pinocchio.git && \
-    cd /home/forest_ws/src/pinocchio && \
+    cd /home/src/pinocchio && \
+    git checkout 4b2ed738b8342c6820ac12597ef2b3e32ddddd97 && \ 
     git submodule init && \
     git submodule update && \
-    mkdir -p /home/forest_ws/build/pinocchio && \
-    cd /home/forest_ws/build/pinocchio && \
-    source /opt/ros/humble/setup.bash && \
-    source /home/forest_ws/setup.bash && \
-    cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_WITH_URDF_SUPPORT=ON -DBUILD_WITH_COLLISION_SUPPORT=OFF -DBUILD_TESTING=FALSE -DBUILD_PYTHON_INTERFACE=OFF ../../src/pinocchio && \
+    mkdir -p /home/build/pinocchio && \
+    cd /home/build/pinocchio && \
+    cmake -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_WITH_URDF_SUPPORT=ON -DBUILD_WITH_COLLISION_SUPPORT=OFF -DBUILD_TESTING=FALSE -DBUILD_PYTHON_INTERFACE=OFF ../../src/pinocchio && \
     make -j8 && \
     make install
-    
+ 
+# these are needed by xbot2_interface    
+RUN apt install -y software-properties-common && add-apt-repository universe && apt update && apt install curl -y && \
+    export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F'"' '{print $4}') && \
+    curl -L -o /tmp/ros2-apt-source.deb "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo ${UBUNTU_CODENAME:-${VERSION_CODENAME}})_all.deb" && \
+    dpkg -i /tmp/ros2-apt-source.deb && apt update && apt upgrade && apt-get install -y ros-humble-urdf ros-humble-srdfdom ros-humble-geometric-shapes 
+RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 
-# xbot2_interface
-WORKDIR /home/forest_ws/src
+RUN apt-get install -y libgtest-dev pybind11-dev libccd-dev
+WORKDIR /home/src
 RUN git clone -b devel https://github.com/hucebot/xbot2_interface.git && \   
-    mkdir -p /home/forest_ws/build/xbot2_interface && \
-    cd /home/forest_ws/build/xbot2_interface && \
-    source /opt/ros/humble/setup.bash && \
-    source /home/forest_ws/setup.bash && \
-    cmake -DXBOT2_IFC_BUILD_TESTS=ON -DXBOT2_IFC_BUILD_ROS=OFF -DXBOT2_IFC_BUILD_ROS2=OFF -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/xbot2_interface && \
+    mkdir -p /home/build/xbot2_interface && \
+    cd /home/build/xbot2_interface && \
+    cmake -DXBOT2_IFC_BUILD_TESTS=ON -DXBOT2_IFC_BUILD_ROS=OFF -DXBOT2_IFC_BUILD_ROS2=OFF -DCMAKE_BUILD_TYPE:STRING=Release -DBoost_USE_DEBUG_RUNTIME=OFF ../../src/xbot2_interface && \
     make -j8 && \
     make install
     
-# osqp
+WORKDIR /home/src
 RUN git clone https://github.com/oxfordcontrol/osqp.git && \
-    cd /home/forest_ws/src/osqp && \
+    cd /home/src/osqp && \
     git checkout 0b34f2ef5c5eec314e7945762e1c8167e937afbd && \
     git submodule init && \
     git submodule update && \
-    mkdir -p /home/forest_ws/build/osqp && \
-    cd /home/forest_ws/build/osqp && \
-    source /opt/ros/humble/setup.bash && \
-    source /home/forest_ws/setup.bash && \
-    cmake -DDLONG=OFF -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/osqp && \
+    mkdir -p /home/build/osqp && \
+    cd /home/build/osqp && \
+    cmake -DDLONG=OFF -DCMAKE_BUILD_TYPE:STRING=Release ../../src/osqp && \
     make -j8 && \
     make install
 
-# proxQP
 RUN git clone https://github.com/Simple-Robotics/proxsuite.git && \
-    cd /home/forest_ws/src/proxsuite && \
+    cd /home/src/proxsuite && \
     git checkout 9f58ebd7bf42fb364de995d25679dc3f675dee7f && \
     git submodule init && \
     git submodule update && \
-    mkdir -p /home/forest_ws/build/proxsuite && \
-    cd /home/forest_ws/build/proxsuite && \
-    source /opt/ros/humble/setup.bash && \
-    source /home/forest_ws/setup.bash && \
-    cmake -DBUILD_WITH_VECTORIZATION_SUPPORT=OFF -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/proxsuite && \
+    mkdir -p /home/build/proxsuite && \
+    cd /home/build/proxsuite && \
+    cmake -DBUILD_WITH_VECTORIZATION_SUPPORT=OFF -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE:STRING=Release ../../src/proxsuite && \
     make -j8 && \
     make install
-    
-RUN apt-get update && apt-get upgrade -y && apt-get clean  && apt-get install -y libxcb-cursor0 gdb
 
-# qpSWIFT
 RUN git clone https://github.com/qpSWIFT/qpSWIFT.git && \
-    mkdir -p /home/forest_ws/build/qpSWIFT && \
-    cd /home/forest_ws/build/qpSWIFT && \
-    source /opt/ros/humble/setup.bash && \
-    source /home/forest_ws/setup.bash && \
-    cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DCMAKE_BUILD_TYPE:STRING=Release ../../src/qpSWIFT && \
+    cd /home/src/qpSWIFT && \
+    git checkout 24608b671d0e7ecde4d14ee8530d1656d6940fd1 && \
+    mkdir -p /home/build/qpSWIFT && \
+    cd /home/build/qpSWIFT && \
+    cmake -DCMAKE_BUILD_TYPE:STRING=Release ../../src/qpSWIFT && \
     make -j8 && \
     make install
-    
-RUN apt-get update && apt-get upgrade -y && apt-get clean  && apt-get install -y nlohmann-json3-dev
-    
-# roboptim
-RUN git clone https://github.com/hucebot/roboptim-core.git && \
-    cd roboptim-core && \
+
+RUN git clone https://github.com/hucebot/OpenSoT.git && \
+    cd /home/src/OpenSoT && \
+    git checkout 2bf8b6d382afbf7e7763ddd8af1065418623f78f && \
     git submodule init && \
     git submodule update && \
-    mkdir -p /home/forest_ws/build/roboptim-core && \
-    cd /home/forest_ws/build/roboptim-core && \
-    source /opt/ros/humble/setup.bash && \
-    source /home/forest_ws/setup.bash && \
-    cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install ../../src/roboptim-core && \
+    mkdir -p /home/build/OpenSoT && \
+    cd /home/build/OpenSoT && \
+    cmake -DCMAKE_BUILD_TYPE:STRING=Release -DOPENSOT_COMPILE_EXAMPLES=ON -DOPENSOT_COMPILE_TESTS=ON ../../src/OpenSoT && \
     make -j8 && \
     make install
-    
-RUN apt-get install -y coinor-libipopt-dev
-RUN git clone https://github.com/hucebot/roboptim-core-plugin-ipopt.git && \
-    cd roboptim-core-plugin-ipopt && \
-    git submodule init && \
-    git submodule update && \
-    mkdir -p /home/forest_ws/build/roboptim-core-plugin-ipopt && \
-    cd /home/forest_ws/build/roboptim-core-plugin-ipopt && \
-    source /opt/ros/humble/setup.bash && \
-    source /home/forest_ws/setup.bash && \
-    cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DDISABLE_TESTS=ON ../../src/roboptim-core-plugin-ipopt && \
-    make -j8 && \
-    make install
-    
-RUN git clone https://github.com/hucebot/roboptim-capsule.git && \
-    cd roboptim-capsule && \
-    git submodule init && \
-    git submodule update && \
-    mkdir -p /home/forest_ws/build/roboptim-capsule && \
-    cd /home/forest_ws/build/roboptim-capsule && \
-    source /opt/ros/humble/setup.bash && \
-    source /home/forest_ws/setup.bash && \
-    cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install ../../src/roboptim-capsule && \
-    make -j8 && \
-    make install
-    
+        
+RUN python3 -m pip install numpy viser matplotlib h5py yourdfpy
 
-RUN git clone https://github.com/hucebot/robot_capsule_generator.git && \
-    mkdir -p /home/forest_ws/build/robot_capsule_generator && \
-    cd /home/forest_ws/build/robot_capsule_generator && \
-    source /opt/ros/humble/setup.bash && \
-    source /home/forest_ws/setup.bash && \
-    cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install ../../src/robot_capsule_generator && \
-    make -j8 && \
-    make install
+#RUN echo "export PYTHONPATH=${PYTHONPATH}:/root/.local/lib/python3.12/site-packages:/usr/lib/python3/dist-packages/" >> ~/.bashrc
+RUN ldconfig
 
-RUN echo "export LD_LIBRARY_PATH=/home/forest_ws/install/lib/roboptim-core/:$LD_LIBRARY_PATH" >> ~/.bashrc
-   
-# mujoco
-RUN git clone https://github.com/deepmind/mujoco.git && \
-    mkdir -p /home/forest_ws/build/mujoco && \
-    cd /home/forest_ws/build/mujoco && \
-    source /opt/ros/humble/setup.bash && \
-    source /home/forest_ws/setup.bash && \
-    #cmake -DCMAKE_INSTALL_PREFIX:STRING=/home/forest_ws/install -DMUJOCO_BUILD_EXAMPLES=OFF -DMUJOCO_BUILD_TESTS=OFF ../../src/mujoco && \
-    cmake -DMUJOCO_BUILD_EXAMPLES=OFF -DMUJOCO_BUILD_TESTS=OFF ../../src/mujoco && \
-    make -j8 && \
-    make install
-    
-
-WORKDIR /home 
-RUN apt-get update && apt-get upgrade -y && apt-get clean  && apt-get install -y ros-humble-xacro ros-humble-joint-state-publisher-gui libglpk-dev libopenblas-dev ros-humble-rosidl-generator-dds-idl
-RUN echo "export PYTHONPATH=${PYTHONPATH}:/root/.local/lib/python3.12/site-packages:/usr/lib/python3/dist-packages/" >> ~/.bashrc
-
-RUN pip3 install h5py viser
-
-RUN mkdir -p /ros2_ws/src
-
-WORKDIR /home/ros2_ws/src
-RUN git clone -b ros2 https://github.com/EnricoMingo/iit-coman-ros-pkg.git
-RUN git clone https://github.com/frankarobotics/franka_description.git
-RUN git clone -b ros2 https://github.com/EnricoMingo/franka_cartesio_config.git
-RUN git clone -b ros2 https://github.com/EnricoMingo/LittleDog.git
-
-RUN git clone -b humble-devel https://github.com/pal-robotics/pmb2_robot.git
-RUN git clone -b humble-devel https://github.com/pal-robotics/tiago_robot.git
-RUN git clone -b humble-devel https://github.com/pal-robotics/tiago_dual_robot.git
-RUN git clone -b humble-devel https://github.com/pal-robotics/omni_base_robot.git
-RUN git clone -b humble-devel https://github.com/pal-robotics/pal_gripper.git
-RUN git clone -b ros2 https://github.com/hucebot/tiago_dual_cartesio_config.git
-
-RUN git clone -b humble-devel https://github.com/pal-robotics/tiago_pro_robot.git
-RUN git clone -b humble-devel https://github.com/pal-robotics/pal_urdf_utils.git
-RUN git clone -b humble-devel https://github.com/pal-robotics/pal_pro_gripper.git
-RUN git clone -b humble-devel https://github.com/pal-robotics/pal_sea_arm.git
-RUN git clone -b humble-devel https://github.com/pal-robotics/tiago_pro_head_robot.git
-
-RUN apt install -y ros-$ROS_DISTRO-realsense2-camera ros-$ROS_DISTRO-realsense2-description
-
-RUN git clone https://github.com/unitreerobotics/unitree_ros2.git
-RUN git clone -b sami https://github.com/itsikelis/huro.git
-
-WORKDIR /home/ros2_ws
-RUN colcon build
-RUN echo "source /home/ros2_ws/install/local_setup.bash" >> ~/.bashrc
-
-WORKDIR /home
