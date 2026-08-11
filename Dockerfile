@@ -7,17 +7,17 @@ ENV TZ="Europe/Paris"
 
 WORKDIR /deps
 
-RUN apt-get update && apt-get upgrade -y && apt-get clean  && apt-get install -y terminator gedit locate cmake-curses-gui python3-pip python3-venv liburdfdom-dev git-all libeigen3-dev libboost-all-dev libhdf5-dev liboctomap-dev octovis libassimp-dev
+RUN apt-get update && apt-get upgrade -y && apt-get clean  && apt-get install -y terminator gedit locate cmake-curses-gui python3-pip python3-venv liburdfdom-dev git-all libeigen3-dev libboost-all-dev libhdf5-dev liboctomap-dev octovis libassimp-dev python3-numpy python-is-python3
 
 WORKDIR /home
 
 # create python virtual env
-RUN python3 -m venv /home/.base
-RUN echo "source /home/.base/bin/activate" >> ~/.bashrc
+# RUN python3 -m venv /home/.base
+# RUN echo "source /home/.base/bin/activate" >> ~/.bashrc
 SHELL ["bash", "-ic"]
-
-RUN pip3 install --upgrade jinja2 typeguard ttictoc "setuptools<81"
-
+RUN echo "numpy==1.26.4" > constraints.txt
+RUN pip3 install --upgrade -c constraints.txt jinja2 typeguard ttictoc "setuptools<81"
+RUN pip3 install -c constraints.txt viser matplotlib h5py yourdfpy
 
 WORKDIR /home/src/
 RUN git clone -b master https://github.com/hucebot/MatLogger2.git && \
@@ -112,8 +112,7 @@ RUN git clone https://github.com/hucebot/OpenSoT.git && \
     make -j8 && \
     make install
         
-RUN python3 -m pip install numpy viser matplotlib h5py yourdfpy
 
-#RUN echo "export PYTHONPATH=${PYTHONPATH}:/root/.local/lib/python3.12/site-packages:/usr/lib/python3/dist-packages/" >> ~/.bashrc
+RUN echo "export PYTHONPATH=/usr/local/lib/python3.10/site-packages/:${PYTHONPATH}" >> ~/.bashrc
 RUN ldconfig
 
