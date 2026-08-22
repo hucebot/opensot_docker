@@ -17,7 +17,7 @@ WORKDIR /home
 SHELL ["bash", "-ic"]
 RUN echo "numpy==1.26.4" > constraints.txt
 RUN pip3 install --upgrade -c constraints.txt jinja2 typeguard ttictoc "setuptools<81"
-RUN pip3 install -c constraints.txt viser matplotlib h5py yourdfpy
+RUN pip3 install -c constraints.txt matplotlib h5py yourdfpy "viser==1.0.26"
 
 WORKDIR /home/src/
 RUN git clone -b master https://github.com/hucebot/MatLogger2.git && \
