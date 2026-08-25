@@ -54,21 +54,33 @@ RUN git clone -b devel https://github.com/stack-of-tasks/pinocchio.git && \
     make install
  
 # these are needed by xbot2_interface    
-RUN apt install -y software-properties-common && add-apt-repository universe && apt update && apt install curl -y && \
-    export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F'"' '{print $4}') && \
-    curl -L -o /tmp/ros2-apt-source.deb "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo ${UBUNTU_CODENAME:-${VERSION_CODENAME}})_all.deb" && \
-    dpkg -i /tmp/ros2-apt-source.deb && apt update && apt upgrade && apt-get install -y ros-humble-urdf ros-humble-srdfdom ros-humble-geometric-shapes 
-RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+# RUN apt install -y software-properties-common && add-apt-repository universe && apt update && apt install curl -y && \
+#     export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F'"' '{print $4}') && \
+#     curl -L -o /tmp/ros2-apt-source.deb "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo ${UBUNTU_CODENAME:-${VERSION_CODENAME}})_all.deb" && \
+#     dpkg -i /tmp/ros2-apt-source.deb && apt update && apt upgrade && apt-get install -y ros-humble-urdf ros-humble-srdfdom ros-humble-geometric-shapes
+# RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 
-RUN apt-get install -y libgtest-dev pybind11-dev libccd-dev
+RUN apt-get install -y libgtest-dev pybind11-dev libccd-dev libtinyxml2-dev
+ARG toto=0
 WORKDIR /home/src
-RUN git clone -b devel https://github.com/hucebot/xbot2_interface.git && \   
+RUN git clone https://gitlab.inria.fr/rochelol/srdfdom-no-ros.git && \
+    cd srdfdom-no-ros && \
+    mkdir -p /home/build/srdfdom && \
+    cd /home/build/srdfdom && \
+    cmake -DCMAKE_BUILD_TYPE:STRING=Release -DTinyXML2_DIR=/usr/lib/x86_64-linux-gnu/cmake/tinyxml2 ../../src/srdfdom-no-ros && \
+    make -j8 && \
+    make install
+
+WORKDIR /home/src
+RUN git clone -b devel https://github.com/hucebot/xbot2_interface.git && \
+    cd xbot2_interface && \
+    git checkout no_ros && \
     mkdir -p /home/build/xbot2_interface && \
     cd /home/build/xbot2_interface && \
     cmake -DXBOT2_IFC_BUILD_TESTS=ON -DXBOT2_IFC_BUILD_ROS=OFF -DXBOT2_IFC_BUILD_ROS2=OFF -DCMAKE_BUILD_TYPE:STRING=Release -DBoost_USE_DEBUG_RUNTIME=OFF ../../src/xbot2_interface && \
     make -j8 && \
     make install
-    
+
 WORKDIR /home/src
 RUN git clone https://github.com/oxfordcontrol/osqp.git && \
     cd /home/src/osqp && \
@@ -103,7 +115,8 @@ RUN git clone https://github.com/qpSWIFT/qpSWIFT.git && \
 
 RUN git clone https://github.com/hucebot/OpenSoT.git && \
     cd /home/src/OpenSoT && \
-    git checkout 2bf8b6d382afbf7e7763ddd8af1065418623f78f && \
+    git checkout no_ros && \
+#     git checkout 2bf8b6d382afbf7e7763ddd8af1065418623f78f && \
     git submodule init && \
     git submodule update && \
     mkdir -p /home/build/OpenSoT && \
@@ -111,7 +124,7 @@ RUN git clone https://github.com/hucebot/OpenSoT.git && \
     cmake -DCMAKE_BUILD_TYPE:STRING=Release -DOPENSOT_COMPILE_EXAMPLES=ON -DOPENSOT_COMPILE_TESTS=ON ../../src/OpenSoT && \
     make -j8 && \
     make install
-        
+
 
 RUN echo "export PYTHONPATH=/usr/local/lib/python3.10/site-packages/:${PYTHONPATH}" >> ~/.bashrc
 RUN ldconfig
