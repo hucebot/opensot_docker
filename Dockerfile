@@ -11,13 +11,13 @@ RUN apt-get update && apt-get upgrade -y && apt-get clean  && apt-get install -y
 
 WORKDIR /home
 
-# create python virtual env
-# RUN python3 -m venv /home/.base
-# RUN echo "source /home/.base/bin/activate" >> ~/.bashrc
 SHELL ["bash", "-ic"]
 RUN echo "numpy==1.26.4" > constraints.txt
-RUN pip3 install --upgrade -c constraints.txt jinja2 typeguard ttictoc "setuptools<81"
-RUN pip3 install -c constraints.txt matplotlib h5py yourdfpy "viser==1.0.26"
+ARG PIP_CONSTRAINT=/home/constraints.txt
+ENV PIP_CONSTRAINT=$PIP_CONSTRAINT
+RUN pip3 install --upgrade jinja2 typeguard ttictoc "setuptools<81"
+RUN pip3 install matplotlib h5py yourdfpy "viser==1.0.26"
+RUN pip3 config list
 
 WORKDIR /home/src/
 RUN git clone -b master https://github.com/hucebot/MatLogger2.git && \
@@ -26,7 +26,7 @@ RUN git clone -b master https://github.com/hucebot/MatLogger2.git && \
     cmake -DCMAKE_BUILD_TYPE:STRING=Release ../../src/MatLogger2 && \
     make -j8 && \
     make install
-    
+
 WORKDIR /home/src
 RUN git clone -b devel https://github.com/coal-library/coal.git && \
     ls -a && \
@@ -39,12 +39,12 @@ RUN git clone -b devel https://github.com/coal-library/coal.git && \
     cmake -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_PYTHON_INTERFACE=OFF ../../src/coal && \
     make -j8 && \
     make install
-    
+
 # this version allows still to use aligned_vector
 WORKDIR /home/src
 RUN git clone -b devel https://github.com/stack-of-tasks/pinocchio.git && \
     cd /home/src/pinocchio && \
-    git checkout 4b2ed738b8342c6820ac12597ef2b3e32ddddd97 && \ 
+    git checkout 4b2ed738b8342c6820ac12597ef2b3e32ddddd97 && \
     git submodule init && \
     git submodule update && \
     mkdir -p /home/build/pinocchio && \
@@ -52,16 +52,9 @@ RUN git clone -b devel https://github.com/stack-of-tasks/pinocchio.git && \
     cmake -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_WITH_URDF_SUPPORT=ON -DBUILD_WITH_COLLISION_SUPPORT=OFF -DBUILD_TESTING=FALSE -DBUILD_PYTHON_INTERFACE=OFF ../../src/pinocchio && \
     make -j8 && \
     make install
- 
-# these are needed by xbot2_interface    
-# RUN apt install -y software-properties-common && add-apt-repository universe && apt update && apt install curl -y && \
-#     export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F'"' '{print $4}') && \
-#     curl -L -o /tmp/ros2-apt-source.deb "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo ${UBUNTU_CODENAME:-${VERSION_CODENAME}})_all.deb" && \
-#     dpkg -i /tmp/ros2-apt-source.deb && apt update && apt upgrade && apt-get install -y ros-humble-urdf ros-humble-srdfdom ros-humble-geometric-shapes
-# RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 
 RUN apt-get install -y libgtest-dev pybind11-dev libccd-dev libtinyxml2-dev
-ARG toto=0
+
 WORKDIR /home/src
 RUN git clone https://gitlab.inria.fr/rochelol/srdfdom-no-ros.git && \
     cd srdfdom-no-ros && \
