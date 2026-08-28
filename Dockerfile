@@ -5,9 +5,7 @@ SHELL ["/bin/bash", "-c"]
 ENV DEBIAN_FRONTEND="noninteractive"
 ENV TZ="Europe/Paris"
 
-WORKDIR /deps
-
-RUN apt-get update && apt-get upgrade -y && apt-get clean  && apt-get install -y terminator gedit locate cmake-curses-gui python3-pip python3-venv liburdfdom-dev git-all libeigen3-dev libboost-all-dev libhdf5-dev liboctomap-dev octovis libassimp-dev python3-numpy python-is-python3
+RUN apt-get update && apt-get upgrade -y && apt-get clean  && apt-get install -y terminator gedit locate cmake-curses-gui python3-pip python3-venv liburdfdom-dev git-all libeigen3-dev libboost-all-dev libhdf5-dev liboctomap-dev octovis libassimp-dev python3-numpy python-is-python3 libgtest-dev pybind11-dev libccd-dev libtinyxml2-dev && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /home
 
@@ -17,15 +15,6 @@ ARG PIP_CONSTRAINT=/home/constraints.txt
 ENV PIP_CONSTRAINT=$PIP_CONSTRAINT
 RUN pip3 install --upgrade jinja2 typeguard ttictoc "setuptools<81"
 RUN pip3 install matplotlib h5py yourdfpy "viser==1.0.26"
-RUN pip3 config list
-
-WORKDIR /home/src/
-RUN git clone -b master https://github.com/hucebot/MatLogger2.git && \
-    mkdir -p /home/build/MatLogger2 && \
-    cd /home/build/MatLogger2 && \
-    cmake -DCMAKE_BUILD_TYPE:STRING=Release ../../src/MatLogger2 && \
-    make -j8 && \
-    make install
 
 WORKDIR /home/src
 RUN git clone -b devel https://github.com/coal-library/coal.git && \
@@ -41,7 +30,6 @@ RUN git clone -b devel https://github.com/coal-library/coal.git && \
     make install
 
 # this version allows still to use aligned_vector
-WORKDIR /home/src
 RUN git clone -b devel https://github.com/stack-of-tasks/pinocchio.git && \
     cd /home/src/pinocchio && \
     git checkout 4b2ed738b8342c6820ac12597ef2b3e32ddddd97 && \
@@ -53,28 +41,6 @@ RUN git clone -b devel https://github.com/stack-of-tasks/pinocchio.git && \
     make -j8 && \
     make install
 
-RUN apt-get install -y libgtest-dev pybind11-dev libccd-dev libtinyxml2-dev
-
-WORKDIR /home/src
-RUN git clone https://gitlab.inria.fr/rochelol/srdfdom-no-ros.git && \
-    cd srdfdom-no-ros && \
-    mkdir -p /home/build/srdfdom && \
-    cd /home/build/srdfdom && \
-    cmake -DCMAKE_BUILD_TYPE:STRING=Release -DTinyXML2_DIR=/usr/lib/x86_64-linux-gnu/cmake/tinyxml2 ../../src/srdfdom-no-ros && \
-    make -j8 && \
-    make install
-
-WORKDIR /home/src
-RUN git clone -b devel https://github.com/hucebot/xbot2_interface.git && \
-    cd xbot2_interface && \
-    git checkout no_ros && \
-    mkdir -p /home/build/xbot2_interface && \
-    cd /home/build/xbot2_interface && \
-    cmake -DXBOT2_IFC_BUILD_TESTS=ON -DXBOT2_IFC_BUILD_ROS=OFF -DXBOT2_IFC_BUILD_ROS2=OFF -DCMAKE_BUILD_TYPE:STRING=Release -DBoost_USE_DEBUG_RUNTIME=OFF ../../src/xbot2_interface && \
-    make -j8 && \
-    make install
-
-WORKDIR /home/src
 RUN git clone https://github.com/oxfordcontrol/osqp.git && \
     cd /home/src/osqp && \
     git checkout 0b34f2ef5c5eec314e7945762e1c8167e937afbd && \
@@ -106,6 +72,30 @@ RUN git clone https://github.com/qpSWIFT/qpSWIFT.git && \
     make -j8 && \
     make install
 
+RUN git clone https://gitlab.inria.fr/rochelol/srdfdom-no-ros.git && \
+    cd srdfdom-no-ros && \
+    mkdir -p /home/build/srdfdom && \
+    cd /home/build/srdfdom && \
+    cmake -DCMAKE_BUILD_TYPE:STRING=Release -DTinyXML2_DIR=/usr/lib/x86_64-linux-gnu/cmake/tinyxml2 ../../src/srdfdom-no-ros && \
+    make -j8 && \
+    make install
+
+RUN git clone -b devel https://github.com/hucebot/xbot2_interface.git && \
+    cd xbot2_interface && \
+    git checkout no_ros && \
+    mkdir -p /home/build/xbot2_interface && \
+    cd /home/build/xbot2_interface && \
+    cmake -DXBOT2_IFC_BUILD_TESTS=ON -DXBOT2_IFC_BUILD_ROS=OFF -DXBOT2_IFC_BUILD_ROS2=OFF -DCMAKE_BUILD_TYPE:STRING=Release -DBoost_USE_DEBUG_RUNTIME=OFF ../../src/xbot2_interface && \
+    make -j8 && \
+    make install
+
+RUN git clone -b master https://github.com/hucebot/MatLogger2.git && \
+    mkdir -p /home/build/MatLogger2 && \
+    cd /home/build/MatLogger2 && \
+    cmake -DCMAKE_BUILD_TYPE:STRING=Release ../../src/MatLogger2 && \
+    make -j8 && \
+    make install
+
 RUN git clone https://github.com/hucebot/OpenSoT.git && \
     cd /home/src/OpenSoT && \
     git checkout no_ros && \
@@ -118,7 +108,5 @@ RUN git clone https://github.com/hucebot/OpenSoT.git && \
     make -j8 && \
     make install
 
-
 RUN echo "export PYTHONPATH=/usr/local/lib/python3.10/site-packages/:${PYTHONPATH}" >> ~/.bashrc
 RUN ldconfig
-
